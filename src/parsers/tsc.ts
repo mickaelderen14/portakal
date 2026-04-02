@@ -198,6 +198,43 @@ export type TSPLCommand =
   | { cmd: "KILL"; target?: string; filename: string }
   | { cmd: "MOVE" }
   | { cmd: "RUN"; filename: string }
+  // BASIC programming (TSPL2)
+  | { cmd: "FOR"; variable: string; start: string; end: string; step?: string }
+  | { cmd: "NEXT" }
+  | { cmd: "IF"; condition: string }
+  | { cmd: "THEN"; statement: string }
+  | { cmd: "ELSE"; statement?: string }
+  | { cmd: "ENDIF" }
+  | { cmd: "WHILE"; condition: string }
+  | { cmd: "WEND" }
+  | { cmd: "DO"; condition?: string }
+  | { cmd: "LOOP"; condition?: string }
+  | { cmd: "GOTO"; label: string }
+  | { cmd: "GOSUB"; label: string }
+  | { cmd: "RETURN" }
+  | { cmd: "END" }
+  | { cmd: "REM"; comment: string }
+  | { cmd: "LABEL"; name: string }
+  | { cmd: "INPUT"; prompt?: string; variable: string }
+  | { cmd: "OUT"; port?: string; data: string }
+  | { cmd: "OPEN"; params: string }
+  | { cmd: "CLOSE"; handle: string }
+  | { cmd: "WRITE"; handle: string; data: string }
+  | { cmd: "READ"; handle: string; variable: string }
+  | { cmd: "SEEK"; handle: string; offset: string }
+  | { cmd: "COPY"; params: string }
+  | { cmd: "BEEP" }
+  | { cmd: "ASSIGNMENT"; variable: string; value: string }
+  // Network commands
+  | { cmd: "NET"; subcommand: string; params: string }
+  | { cmd: "WLAN"; subcommand: string; params: string }
+  | { cmd: "NFC"; subcommand: string; params?: string }
+  // GPIO commands
+  | { cmd: "SET_GPO"; params: string }
+  | { cmd: "SET_GPI"; params: string }
+  | { cmd: "PEEL_SENSOR" }
+  | { cmd: "GETSENSOR"; params: string }
+  | { cmd: "GETSETTING"; params: string }
   // Unknown
   | { cmd: "UNKNOWN"; raw: string };
 
@@ -1058,6 +1095,210 @@ export function parseTSPL(code: string): TSPLParseResult {
 
     if (upperLine.startsWith("RUN")) {
       commands.push({ cmd: "RUN", filename: unquote(line.slice(3).trim()) });
+      continue;
+    }
+
+    // ===== BASIC PROGRAMMING (TSPL2) =====
+
+    // FOR var = start TO end [STEP n]
+    if (upperLine.startsWith("FOR ")) {
+      const m = line.match(/^FOR\s+(\w+)\s*=\s*(.+?)\s+TO\s+(.+?)(?:\s+STEP\s+(.+))?$/i);
+      if (m) {
+        commands.push({ cmd: "FOR", variable: m[1], start: m[2], end: m[3], step: m[4] });
+      }
+      continue;
+    }
+
+    if (upperLine === "NEXT") {
+      commands.push({ cmd: "NEXT" });
+      continue;
+    }
+    if (upperLine === "ENDIF") {
+      commands.push({ cmd: "ENDIF" });
+      continue;
+    }
+    if (upperLine === "WEND") {
+      commands.push({ cmd: "WEND" });
+      continue;
+    }
+    if (upperLine === "RETURN") {
+      commands.push({ cmd: "RETURN" });
+      continue;
+    }
+    if (upperLine === "END") {
+      commands.push({ cmd: "END" });
+      continue;
+    }
+    if (upperLine === "BEEP") {
+      commands.push({ cmd: "BEEP" });
+      continue;
+    }
+    if (upperLine === "PEEL") {
+      commands.push({ cmd: "PEEL_SENSOR" });
+      continue;
+    }
+    if (upperLine === "EXITFOR") {
+      commands.push({ cmd: "NEXT" });
+      continue;
+    }
+    if (upperLine === "EXITDO") {
+      commands.push({ cmd: "LOOP" });
+      continue;
+    }
+
+    if (upperLine.startsWith("IF ")) {
+      commands.push({
+        cmd: "IF",
+        condition: line
+          .slice(3)
+          .replace(/\s+THEN\s*$/i, "")
+          .trim(),
+      });
+      continue;
+    }
+
+    if (upperLine.startsWith("THEN ") || upperLine === "THEN") {
+      commands.push({ cmd: "THEN", statement: line.slice(5).trim() });
+      continue;
+    }
+
+    if (
+      upperLine.startsWith("ELSE") &&
+      (upperLine === "ELSE" || upperLine.startsWith("ELSE ") || upperLine.startsWith("ELSEIF"))
+    ) {
+      commands.push({ cmd: "ELSE", statement: line.slice(4).trim() || undefined });
+      continue;
+    }
+
+    if (upperLine.startsWith("WHILE ")) {
+      commands.push({ cmd: "WHILE", condition: line.slice(6).trim() });
+      continue;
+    }
+
+    if (upperLine.startsWith("DO")) {
+      commands.push({ cmd: "DO", condition: line.slice(2).trim() || undefined });
+      continue;
+    }
+
+    if (upperLine.startsWith("LOOP")) {
+      commands.push({ cmd: "LOOP", condition: line.slice(4).trim() || undefined });
+      continue;
+    }
+
+    if (upperLine.startsWith("GOTO ")) {
+      commands.push({ cmd: "GOTO", label: line.slice(5).trim() });
+      continue;
+    }
+
+    if (upperLine.startsWith("GOSUB ")) {
+      commands.push({ cmd: "GOSUB", label: line.slice(6).trim() });
+      continue;
+    }
+
+    if (upperLine.startsWith("REM ") || upperLine === "REM") {
+      commands.push({ cmd: "REM", comment: line.slice(3).trim() });
+      continue;
+    }
+
+    if (upperLine.startsWith("INPUT ")) {
+      commands.push({ cmd: "INPUT", prompt: undefined, variable: line.slice(6).trim() });
+      continue;
+    }
+
+    if (upperLine.startsWith("OUT ")) {
+      commands.push({ cmd: "OUT", port: undefined, data: line.slice(4).trim() });
+      continue;
+    }
+
+    if (upperLine.startsWith("OPEN ")) {
+      commands.push({ cmd: "OPEN", params: line.slice(5).trim() });
+      continue;
+    }
+
+    if (upperLine.startsWith("CLOSE ")) {
+      commands.push({ cmd: "CLOSE", handle: line.slice(6).trim() });
+      continue;
+    }
+
+    if (upperLine.startsWith("WRITE ")) {
+      const parts = line.slice(6).trim().split(",", 2);
+      commands.push({ cmd: "WRITE", handle: parts[0].trim(), data: (parts[1] ?? "").trim() });
+      continue;
+    }
+
+    if (upperLine.startsWith("READ ")) {
+      const parts = line.slice(5).trim().split(",", 2);
+      commands.push({ cmd: "READ", handle: parts[0].trim(), variable: (parts[1] ?? "").trim() });
+      continue;
+    }
+
+    if (upperLine.startsWith("SEEK ")) {
+      const parts = line.slice(5).trim().split(",", 2);
+      commands.push({ cmd: "SEEK", handle: parts[0].trim(), offset: (parts[1] ?? "").trim() });
+      continue;
+    }
+
+    if (upperLine.startsWith("COPY ")) {
+      commands.push({ cmd: "COPY", params: line.slice(5).trim() });
+      continue;
+    }
+
+    // Label (line ending with :)
+    if (line.endsWith(":") && !line.includes(",")) {
+      commands.push({ cmd: "LABEL", name: line.slice(0, -1).trim() });
+      continue;
+    }
+
+    // ===== NETWORK COMMANDS =====
+
+    if (upperLine.startsWith("NET ")) {
+      const parts = line.slice(4).trim().split(/\s+/, 2);
+      commands.push({ cmd: "NET", subcommand: parts[0], params: parts[1] ?? "" });
+      continue;
+    }
+
+    if (upperLine.startsWith("WLAN ")) {
+      const parts = line.slice(5).trim().split(/\s+/, 2);
+      commands.push({ cmd: "WLAN", subcommand: parts[0], params: parts[1] ?? "" });
+      continue;
+    }
+
+    if (upperLine.startsWith("NFC ")) {
+      const parts = line.slice(4).trim().split(/\s+/, 2);
+      commands.push({ cmd: "NFC", subcommand: parts[0], params: parts[1] });
+      continue;
+    }
+
+    // ===== GPIO COMMANDS =====
+
+    if (upperLine.startsWith("SET GPO")) {
+      commands.push({ cmd: "SET_GPO", params: line.slice(7).trim() });
+      continue;
+    }
+
+    if (upperLine.startsWith("SET GPI")) {
+      commands.push({ cmd: "SET_GPI", params: line.slice(7).trim() });
+      continue;
+    }
+
+    if (upperLine.startsWith("GETSENSOR")) {
+      commands.push({ cmd: "GETSENSOR", params: line.slice(9).trim() });
+      continue;
+    }
+
+    if (upperLine.startsWith("GETSETTING")) {
+      commands.push({ cmd: "GETSETTING", params: line.slice(10).trim() });
+      continue;
+    }
+
+    // ===== ASSIGNMENT (variable = expression) =====
+    if (line.includes("=") && !upperLine.startsWith("SET ") && /^[@\w$]+\s*=/.test(line)) {
+      const eqIdx = line.indexOf("=");
+      commands.push({
+        cmd: "ASSIGNMENT",
+        variable: line.slice(0, eqIdx).trim(),
+        value: line.slice(eqIdx + 1).trim(),
+      });
       continue;
     }
 

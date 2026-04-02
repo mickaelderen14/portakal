@@ -505,6 +505,106 @@ PRINT 1`;
   });
 });
 
+describe("parseTSPL — BASIC Programming", () => {
+  it("parses FOR...NEXT", () => {
+    const r = parseTSPL("FOR I = 1 TO 10 STEP 2\nNEXT");
+    expect(r.commands[0]).toMatchObject({
+      cmd: "FOR",
+      variable: "I",
+      start: "1",
+      end: "10",
+      step: "2",
+    });
+    expect(r.commands[1]).toMatchObject({ cmd: "NEXT" });
+  });
+
+  it("parses IF...ENDIF", () => {
+    const r = parseTSPL("IF X > 5 THEN\nENDIF");
+    expect(r.commands[0]).toMatchObject({ cmd: "IF", condition: "X > 5" });
+    expect(r.commands[1]).toMatchObject({ cmd: "ENDIF" });
+  });
+
+  it("parses WHILE...WEND", () => {
+    const r = parseTSPL("WHILE I < 10\nWEND");
+    expect(r.commands[0]).toMatchObject({ cmd: "WHILE", condition: "I < 10" });
+    expect(r.commands[1]).toMatchObject({ cmd: "WEND" });
+  });
+
+  it("parses GOTO and GOSUB", () => {
+    const r = parseTSPL("GOTO START\nGOSUB PRINT_LABEL");
+    expect(r.commands[0]).toMatchObject({ cmd: "GOTO", label: "START" });
+    expect(r.commands[1]).toMatchObject({ cmd: "GOSUB", label: "PRINT_LABEL" });
+  });
+
+  it("parses REM comments", () => {
+    expect(parseTSPL("REM This is a comment").commands[0]).toMatchObject({
+      cmd: "REM",
+      comment: "This is a comment",
+    });
+  });
+
+  it("parses RETURN, END, BEEP", () => {
+    const r = parseTSPL("RETURN\nEND\nBEEP");
+    expect(r.commands.map((c) => c.cmd)).toEqual(["RETURN", "END", "BEEP"]);
+  });
+
+  it("parses OPEN, CLOSE, WRITE, READ, SEEK, COPY", () => {
+    const r = parseTSPL(
+      'OPEN "data.txt",0\nWRITE 0,A$\nREAD 0,B$\nSEEK 0,100\nCLOSE 0\nCOPY F,"src.txt",F,"dst.txt"',
+    );
+    expect(r.commands.map((c) => c.cmd)).toEqual([
+      "OPEN",
+      "WRITE",
+      "READ",
+      "SEEK",
+      "CLOSE",
+      "COPY",
+    ]);
+  });
+
+  it("parses labels (ending with :)", () => {
+    expect(parseTSPL("START:").commands[0]).toMatchObject({ cmd: "LABEL", name: "START" });
+  });
+
+  it("parses assignments", () => {
+    expect(parseTSPL('A$ = "hello"').commands[0]).toMatchObject({
+      cmd: "ASSIGNMENT",
+      variable: "A$",
+    });
+    expect(parseTSPL("@1 = 100").commands[0]).toMatchObject({ cmd: "ASSIGNMENT", variable: "@1" });
+  });
+});
+
+describe("parseTSPL — Network/GPIO Commands", () => {
+  it("parses NET commands", () => {
+    const r = parseTSPL(
+      'NET DHCP\nNET IP "192.168.1.100","255.255.255.0","192.168.1.1"\nNET PORT 9100',
+    );
+    expect(r.commands.map((c) => c.cmd)).toEqual(["NET", "NET", "NET"]);
+    expect(r.commands[0]).toMatchObject({ cmd: "NET", subcommand: "DHCP" });
+  });
+
+  it("parses WLAN commands", () => {
+    const r = parseTSPL('WLAN SSID "MyNetwork"\nWLAN WPA "password123"\nWLAN DHCP');
+    expect(r.commands.map((c) => c.cmd)).toEqual(["WLAN", "WLAN", "WLAN"]);
+  });
+
+  it("parses NFC commands", () => {
+    const r = parseTSPL("NFC FEATURE\nNFC STATUS\nNFC TIMEOUT 30");
+    expect(r.commands.map((c) => c.cmd)).toEqual(["NFC", "NFC", "NFC"]);
+  });
+
+  it("parses GETSENSOR", () => {
+    expect(parseTSPL('GETSENSOR("GAP")').commands[0]).toMatchObject({ cmd: "GETSENSOR" });
+  });
+
+  it("parses GETSETTING", () => {
+    expect(parseTSPL('GETSETTING$("SYSTEM","INFORMATION","MODEL")').commands[0]).toMatchObject({
+      cmd: "GETSETTING",
+    });
+  });
+});
+
 describe("parseTSC (simple API for web)", () => {
   it("returns widthDots, heightDots, elements", () => {
     const result = parseTSC('SIZE 40 mm,30 mm\nCLS\nTEXT 10,10,"2",0,2,2,"Hello"');

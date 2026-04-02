@@ -1,4 +1,4 @@
-import { label } from "portakal";
+import { label, type LabelBuilder } from "portakal";
 
 function $(sel: string): HTMLElement {
   return document.querySelector(sel)!;
@@ -16,68 +16,78 @@ function num(id: string): number {
 
 let currentLang: "tsc" | "zpl" | "epl" | "escpos" = "tsc";
 
+function buildLabel(): LabelBuilder {
+  const b = label({
+    width: num("#lbl-width") || 40,
+    height: num("#lbl-height") || 30,
+    unit: "mm",
+    dpi: num("#lbl-dpi") || 203,
+    gap: num("#lbl-gap") || 3,
+    speed: num("#lbl-speed") || 4,
+    density: num("#lbl-density") || 8,
+    copies: num("#lbl-copies") || 1,
+  });
+
+  const textContent = val("#el-text");
+  if (textContent) {
+    b.text(textContent, {
+      x: num("#el-text-x"),
+      y: num("#el-text-y"),
+      size: num("#el-text-size") || 1,
+    });
+  }
+
+  const bcData = val("#el-barcode");
+  if (bcData) {
+    b.barcode(bcData, {
+      type: val("#el-barcode-type") as any,
+      x: num("#el-barcode-x"),
+      y: num("#el-barcode-y"),
+      height: num("#el-barcode-h") || 60,
+    });
+  }
+
+  const qrData = val("#el-qr");
+  if (qrData) {
+    b.qrcode(qrData, {
+      x: num("#el-qr-x"),
+      y: num("#el-qr-y"),
+      size: num("#el-qr-size") || 6,
+      ecc: (val("#el-qr-ecc") as any) || "M",
+    });
+  }
+
+  if (($("#el-box-enable") as HTMLInputElement).checked) {
+    b.box({
+      x: num("#el-box-x"),
+      y: num("#el-box-y"),
+      width: num("#el-box-w") || 100,
+      height: num("#el-box-h") || 100,
+      thickness: num("#el-box-t") || 1,
+    });
+  }
+
+  if (($("#el-line-enable") as HTMLInputElement).checked) {
+    b.line({
+      x1: num("#el-line-x1"),
+      y1: num("#el-line-y1"),
+      x2: num("#el-line-x2") || 300,
+      y2: num("#el-line-y2"),
+      thickness: num("#el-line-t") || 1,
+    });
+  }
+
+  return b;
+}
+
 function generate(): void {
   try {
-    const b = label({
-      width: num("#lbl-width") || 40,
-      height: num("#lbl-height") || 30,
-      unit: "mm",
-      dpi: num("#lbl-dpi") || 203,
-      gap: num("#lbl-gap") || 3,
-      speed: num("#lbl-speed") || 4,
-      density: num("#lbl-density") || 8,
-      copies: num("#lbl-copies") || 1,
-    });
+    const b = buildLabel();
 
-    const textContent = val("#el-text");
-    if (textContent) {
-      b.text(textContent, {
-        x: num("#el-text-x"),
-        y: num("#el-text-y"),
-        size: num("#el-text-size") || 1,
-      });
-    }
+    // Preview
+    $("#preview-container").innerHTML = b.toPreview();
 
-    const bcData = val("#el-barcode");
-    if (bcData) {
-      b.barcode(bcData, {
-        type: val("#el-barcode-type") as any,
-        x: num("#el-barcode-x"),
-        y: num("#el-barcode-y"),
-        height: num("#el-barcode-h") || 60,
-      });
-    }
-
-    const qrData = val("#el-qr");
-    if (qrData) {
-      b.qrcode(qrData, {
-        x: num("#el-qr-x"),
-        y: num("#el-qr-y"),
-        size: num("#el-qr-size") || 6,
-        ecc: (val("#el-qr-ecc") as any) || "M",
-      });
-    }
-
-    if (($("#el-box-enable") as HTMLInputElement).checked) {
-      b.box({
-        x: num("#el-box-x"),
-        y: num("#el-box-y"),
-        width: num("#el-box-w") || 100,
-        height: num("#el-box-h") || 100,
-        thickness: num("#el-box-t") || 1,
-      });
-    }
-
-    if (($("#el-line-enable") as HTMLInputElement).checked) {
-      b.line({
-        x1: num("#el-line-x1"),
-        y1: num("#el-line-y1"),
-        x2: num("#el-line-x2") || 300,
-        y2: num("#el-line-y2"),
-        thickness: num("#el-line-t") || 1,
-      });
-    }
-
+    // Code output
     let output: string;
     if (currentLang === "escpos") {
       output = formatHex(b.toESCPOS());
@@ -93,6 +103,7 @@ function generate(): void {
     $("#output-error").setAttribute("hidden", "");
   } catch (e: any) {
     $("#output-code").textContent = "";
+    $("#preview-container").innerHTML = "";
     const err = $("#output-error");
     err.textContent = e.message;
     err.removeAttribute("hidden");

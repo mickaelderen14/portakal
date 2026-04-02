@@ -62,5 +62,13 @@
     "oxlint": "^1.57.0",
     "typescript": "^6.0.2",
     "vitest": "^4.1.1"
+  },
+  "peerDependencies": {
+    "etiket": ">=0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "etiket": {
+      "optional": true
+    }
   }
 }

@@ -1,6 +1,9 @@
 # portakal
 
-Universal printer language SDK — TSC, ZPL, EPL, ESC/POS, CPCL, DPL, IPL, SBPL and more. Text, barcode, QR, images. Pure TypeScript, zero dependencies.
+Universal printer language SDK — TSC, ZPL, EPL, ESC/POS, CPCL, DPL, IPL, SBPL and more. Text, images, and printer-native barcode/QR commands. Pure TypeScript, zero runtime dependencies.
+
+> [!NOTE]
+> **Barcode/QR generation is NOT in this package.** Use [`etiket`](https://github.com/productdevbook/etiket) for barcode & QR code generation (SVG/PNG). Portakal sends printer-native barcode/QR commands (the printer's built-in encoder) OR accepts pre-rendered images from `etiket` for pixel-perfect output.
 
 > [!IMPORTANT]
 > Keep `AGENTS.md` updated with project status.
@@ -43,13 +46,32 @@ Single entry: `portakal`. Builder pattern for constructing labels:
 ```ts
 import { label } from "portakal";
 
+// Printer-native barcode/QR (printer's built-in encoder handles it)
 const cmd = label({ width: 40, height: 30, unit: "mm" })
   .text("Hello World", { x: 10, y: 10, font: "A", size: 2 })
   .barcode("123456789", { x: 10, y: 50, type: "code128", height: 60 })
   .qrcode("https://example.com", { x: 10, y: 120, size: 6 })
   .image(buffer, { x: 200, y: 10, width: 100 })
   .print(2)
-  .toTSC();    // or .toZPL(), .toEPL(), .toESCPOS(), etc.
+  .toTSC(); // or .toZPL(), .toEPL(), .toESCPOS(), etc.
+```
+
+### Using with `etiket` for pre-rendered barcode/QR images
+
+```ts
+import { label } from "portakal";
+import { barcodePNG, qrcodePNG } from "etiket";
+
+// Generate barcode/QR as PNG with etiket, then embed as image
+const barcodeImg = barcodePNG("123456789", { format: "code128" });
+const qrImg = qrcodePNG("https://example.com");
+
+const cmd = label({ width: 40, height: 30, unit: "mm" })
+  .text("Product Label", { x: 10, y: 5 })
+  .image(barcodeImg, { x: 10, y: 40, width: 200 })
+  .image(qrImg, { x: 220, y: 40, width: 80 })
+  .print(1)
+  .toZPL();
 ```
 
 ## Build & Scripts

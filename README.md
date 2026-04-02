@@ -1,8 +1,12 @@
 <p align="center">
   <br>
+  <img src=".github/assets/cover.png" alt="portakal — Universal printer language SDK" width="100%">
+  <br><br>
   <b style="font-size: 2em;">portakal</b>
   <br><br>
   Universal printer language SDK — TSC, ZPL, EPL, ESC/POS and more.
+  <br>
+  Text, barcodes, QR codes, images, shapes — anything you can print.
   <br>
   One API, every thermal printer. Pure TypeScript, zero dependencies.
   <br><br>
@@ -24,28 +28,70 @@
 npm install portakal
 ```
 
-### Printer-native barcode/QR (zero dependencies)
-
-The printer's built-in encoder handles barcode/QR generation. Fast, minimal data:
+### Product label (text + barcode + QR + shapes)
 
 ```ts
 import { label } from "portakal";
 
 const cmd = label({ width: 40, height: 30, unit: "mm" })
-  .text("Hello World", { x: 10, y: 10, size: 2 })
-  .barcode("123456789", { type: "code128", x: 10, y: 50, height: 60 })
-  .qrcode("https://example.com", { x: 10, y: 120, ecc: "M", size: 6 })
+  .text("ACME Corp", { x: 10, y: 10, size: 2 })
+  .text("SKU: PRD-00123", { x: 10, y: 35, font: "2" })
+  .barcode("123456789012", { type: "ean13", x: 10, y: 60, height: 50 })
+  .qrcode("https://acme.com/prd/123", { x: 220, y: 60, ecc: "M", size: 5 })
+  .line({ x1: 5, y1: 55, x2: 310, y2: 55, thickness: 1 })
   .box({ x: 5, y: 5, width: 310, height: 230, thickness: 2 })
-  .toTSC(); // string — TSC/TSPL2 commands
+  .toTSC();
 ```
 
-Same label definition, any printer language:
+### Shipping label (multiple text fields + barcode)
 
 ```ts
-cmd.toTSC(); // TSC/TSPL2  — label printers (TSC, Gprinter, Xprinter, iDPRT)
-cmd.toZPL(); // Zebra ZPL II — desktop/industrial (GK420, ZT410, ZD620)
-cmd.toEPL(); // Eltron EPL2 — desktop (LP/TLP 2824, GX420, ZD220)
-cmd.toESCPOS(); // ESC/POS — receipt printers (Epson, Bixolon, Star, Citizen)
+const shipping = label({ width: 100, height: 150, unit: "mm" })
+  .text("FROM: Warehouse A", { x: 10, y: 10 })
+  .text("TO: John Doe", { x: 10, y: 30, size: 2 })
+  .text("123 Main St, New York, NY 10001", { x: 10, y: 55 })
+  .barcode("SSCC00012345678901234", { type: "code128", x: 10, y: 80, height: 80 })
+  .qrcode("https://track.example.com/PKG123", { x: 300, y: 80, size: 8 })
+  .line({ x1: 5, y1: 70, x2: 780, y2: 70, thickness: 2 })
+  .toZPL();
+```
+
+### Receipt (ESC/POS — text, barcode, QR)
+
+```ts
+const receipt = label({ width: 80, unit: "mm" })
+  .text("MY STORE", { align: "center", bold: true, size: 2 })
+  .text("123 Market St", { align: "center" })
+  .text("================================")
+  .text("Hamburger           x2    $25.98")
+  .text("Cola                x1     $3.50")
+  .text("================================")
+  .text("TOTAL                     $29.48", { bold: true, size: 2 })
+  .barcode("INV-20260402-001", { type: "code128", height: 60 })
+  .qrcode("https://receipt.example.com/inv/001")
+  .toESCPOS(); // Uint8Array (binary)
+```
+
+### Logo / image printing
+
+```ts
+const cmd = label({ width: 40, height: 30, unit: "mm" })
+  .image(myLogoBitmap, { x: 10, y: 10, width: 100 })
+  .text("Company Name", { x: 120, y: 20, size: 2 })
+  .toTSC();
+```
+
+### Same label → any printer language
+
+```ts
+const myLabel = label({ width: 40, height: 30, unit: "mm" })
+  .text("Hello World", { x: 10, y: 10, size: 2 })
+  .barcode("123456789", { type: "code128", x: 10, y: 50, height: 60 });
+
+myLabel.toTSC(); // TSC/TSPL2  — TSC, Gprinter, Xprinter, iDPRT
+myLabel.toZPL(); // Zebra ZPL II — GK420, ZT410, ZD620
+myLabel.toEPL(); // Eltron EPL2 — LP/TLP 2824, GX420, ZD220
+myLabel.toESCPOS(); // ESC/POS — Epson, Bixolon, Star, Citizen
 ```
 
 ### Software-rendered barcode/QR (with etiket)

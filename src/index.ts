@@ -6,6 +6,9 @@ export { compileToZPL } from "./languages/zpl";
 export { compileToEPL } from "./languages/epl";
 export { compileToESCPOS } from "./languages/escpos";
 export { compileToCPCL } from "./languages/cpcl";
+export { compileToDPL } from "./languages/dpl";
+export { compileToSBPL } from "./languages/sbpl";
+export { compileToStarPRNT } from "./languages/starprnt";
 export { renderPreview } from "./preview";
 export {
   imageToMonochrome,

@@ -16,6 +16,9 @@ import { compileToZPL } from "./languages/zpl";
 import { compileToEPL } from "./languages/epl";
 import { compileToESCPOS } from "./languages/escpos";
 import { compileToCPCL } from "./languages/cpcl";
+import { compileToDPL } from "./languages/dpl";
+import { compileToSBPL } from "./languages/sbpl";
+import { compileToStarPRNT } from "./languages/starprnt";
 import { renderPreview } from "./preview";
 
 export class LabelBuilder {
@@ -106,6 +109,21 @@ export class LabelBuilder {
   /** Compile to CPCL command string (Zebra mobile printers) */
   toCPCL(): string {
     return compileToCPCL(this.resolve());
+  }
+
+  /** Compile to DPL command string (Honeywell/Datamax printers) */
+  toDPL(): string {
+    return compileToDPL(this.resolve());
+  }
+
+  /** Compile to SBPL command string (SATO printers) */
+  toSBPL(): string {
+    return compileToSBPL(this.resolve());
+  }
+
+  /** Compile to Star PRNT byte sequence (Star Micronics printers) */
+  toStarPRNT(): Uint8Array {
+    return compileToStarPRNT(this.resolve());
   }
 
   /** Render as SVG preview (for development/testing without a physical printer) */

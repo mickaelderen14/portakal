@@ -1,6 +1,6 @@
 <p align="center">
   <br>
-  <img src=".github/assets/cover.png" alt="portakal — Universal printer language SDK" width="100%">
+  <img src="https://raw.githubusercontent.com/productdevbook/portakal/main/.github/assets/cover.png" alt="portakal — Universal printer language SDK" width="100%">
   <br><br>
   <b style="font-size: 2em;">portakal</b>
   <br><br>

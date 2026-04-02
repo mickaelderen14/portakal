@@ -51,6 +51,13 @@ export type { ValidationIssue, ValidationResult } from "./validate";
 // Drizzle-style per-language modules (tree-shakeable)
 export { tsc } from "./lang/tsc";
 export { zpl } from "./lang/zpl";
+export { epl } from "./lang/epl";
+export { cpcl } from "./lang/cpcl";
+export { dpl } from "./lang/dpl";
+export { sbpl } from "./lang/sbpl";
+export { escpos } from "./lang/escpos";
+export { starprnt } from "./lang/starprnt";
+export { ipl } from "./lang/ipl";
 export type {
   PrinterTransport,
   ConnectionState,

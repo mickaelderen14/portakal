@@ -30,37 +30,51 @@
 npm install portakal
 ```
 
-### Product label (text + barcode + QR + shapes)
+### Product label
 
 ```ts
-import { label } from "portakal";
+import { label } from "portakal/core";
+import { tsc } from "portakal/lang/tsc";
 
-const cmd = label({ width: 40, height: 30, unit: "mm" })
+const myLabel = label({ width: 40, height: 30, unit: "mm" })
   .text("ACME Corp", { x: 10, y: 10, size: 2 })
-  .text("SKU: PRD-00123", { x: 10, y: 35, font: "2" })
-  .barcode("123456789012", { type: "ean13", x: 10, y: 60, height: 50 })
-  .qrcode("https://acme.com/prd/123", { x: 220, y: 60, ecc: "M", size: 5 })
-  .line({ x1: 5, y1: 55, x2: 310, y2: 55, thickness: 1 })
-  .box({ x: 5, y: 5, width: 310, height: 230, thickness: 2 })
-  .toTSC();
+  .text("SKU: PRD-00123", { x: 10, y: 35 })
+  .line({ x1: 5, y1: 55, x2: 310, y2: 55 })
+  .box({ x: 5, y: 5, width: 310, height: 230, thickness: 2 });
+
+const code = tsc.compile(myLabel); // TSC/TSPL2 commands
+const svg = tsc.preview(myLabel); // SVG preview with TSC font metrics
 ```
 
-### Shipping label (multiple text fields + barcode)
+### Same label → any language
 
 ```ts
-const shipping = label({ width: 100, height: 150, unit: "mm" })
-  .text("FROM: Warehouse A", { x: 10, y: 10 })
-  .text("TO: John Doe", { x: 10, y: 30, size: 2 })
-  .text("123 Main St, New York, NY 10001", { x: 10, y: 55 })
-  .barcode("SSCC00012345678901234", { type: "code128", x: 10, y: 80, height: 80 })
-  .qrcode("https://track.example.com/PKG123", { x: 300, y: 80, size: 8 })
-  .line({ x1: 5, y1: 70, x2: 780, y2: 70, thickness: 2 })
-  .toZPL();
+import { label } from "portakal/core";
+import { tsc } from "portakal/lang/tsc";
+import { zpl } from "portakal/lang/zpl";
+import { epl } from "portakal/lang/epl";
+import { escpos } from "portakal/lang/escpos";
+
+const myLabel = label({ width: 40, height: 30, unit: "mm" }).text("Hello World", {
+  x: 10,
+  y: 10,
+  size: 2,
+});
+
+tsc.compile(myLabel); // TSC/TSPL2  — TSC, Gprinter, Xprinter, iDPRT
+zpl.compile(myLabel); // Zebra ZPL II — GK420, ZT410, ZD620
+epl.compile(myLabel); // Eltron EPL2 — LP/TLP 2824, GX420, ZD220
+escpos.compile(myLabel); // ESC/POS — Epson, Bixolon, Star, Citizen (Uint8Array)
 ```
 
-### Receipt (ESC/POS — text, barcode, QR)
+Only the imported languages enter your bundle — 100% tree-shakeable.
+
+### Receipt (ESC/POS)
 
 ```ts
+import { label } from "portakal/core";
+import { escpos } from "portakal/lang/escpos";
+
 const receipt = label({ width: 80, unit: "mm" })
   .text("MY STORE", { align: "center", bold: true, size: 2 })
   .text("123 Market St", { align: "center" })
@@ -68,113 +82,50 @@ const receipt = label({ width: 80, unit: "mm" })
   .text("Hamburger           x2    $25.98")
   .text("Cola                x1     $3.50")
   .text("================================")
-  .text("TOTAL                     $29.48", { bold: true, size: 2 })
-  .barcode("INV-20260402-001", { type: "code128", height: 60 })
-  .qrcode("https://receipt.example.com/inv/001")
-  .toESCPOS(); // Uint8Array (binary)
+  .text("TOTAL                     $29.48", { bold: true, size: 2 });
+
+const bytes = escpos.compile(receipt); // Uint8Array
+const svg = escpos.preview(receipt); // Receipt-style SVG
 ```
 
-### Logo / image printing
+### Each module: compile + parse + preview + validate
 
 ```ts
-const cmd = label({ width: 40, height: 30, unit: "mm" })
-  .image(myLogoBitmap, { x: 10, y: 10, width: 100 })
-  .text("Company Name", { x: 120, y: 20, size: 2 })
-  .toTSC();
+import { tsc } from "portakal/lang/tsc";
+
+// Compile: label → printer commands
+tsc.compile(myLabel);
+
+// Preview: label → SVG (per-language font metrics)
+tsc.preview(myLabel);
+
+// Parse: printer commands → structured data
+tsc.parse(tscCode); // { commands, elements, widthDots, ... }
+
+// Validate: check for errors
+tsc.validate(tscCode); // { valid, errors, issues }
 ```
 
-### Same label → any printer language
+Available: `tsc`, `zpl`, `epl`, `cpcl`, `dpl`, `sbpl`, `escpos`, `starprnt`, `ipl`
 
-```ts
-const myLabel = label({ width: 40, height: 30, unit: "mm" })
-  .text("Hello World", { x: 10, y: 10, size: 2 })
-  .barcode("123456789", { type: "code128", x: 10, y: 50, height: 60 });
+### Barcode/QR via etiket
 
-myLabel.toTSC(); // TSC/TSPL2  — TSC, Gprinter, Xprinter, iDPRT
-myLabel.toZPL(); // Zebra ZPL II — GK420, ZT410, ZD620
-myLabel.toEPL(); // Eltron EPL2 — LP/TLP 2824, GX420, ZD220
-myLabel.toESCPOS(); // ESC/POS — Epson, Bixolon, Star, Citizen
-```
-
-### Language Modules (tree-shakeable)
-
-Each language is a standalone module with compile, parse, preview, and validate:
+Use [`etiket`](https://github.com/productdevbook/etiket) for barcode/QR generation, then embed as image:
 
 ```ts
 import { label } from "portakal/core";
 import { tsc } from "portakal/lang/tsc";
-import { zpl } from "portakal/lang/zpl";
-import { escpos } from "portakal/lang/escpos";
-
-const myLabel = label({ width: 40, height: 30 })
-  .text("Hello", { x: 10, y: 10, size: 2 })
-  .box({ x: 5, y: 5, width: 310, height: 230, thickness: 2 });
-
-// Compile — only imported language enters your bundle
-tsc.compile(myLabel); // TSC/TSPL2 commands (string)
-zpl.compile(myLabel); // ZPL II commands (string)
-escpos.compile(myLabel); // ESC/POS bytes (Uint8Array)
-
-// Preview — each language uses its own font metrics
-tsc.preview(myLabel); // SVG with TSC fonts (8x12 to 32x48)
-zpl.preview(myLabel); // SVG with ZPL fonts (A:5x9 to V:71x80)
-escpos.preview(myLabel); // Receipt-style SVG (line-by-line)
-
-// Parse — reverse
-tsc.parse(tscCode); // { commands, elements, widthDots, ... }
-zpl.parse(zplCode); // { commands, elements, warnings, ... }
-
-// Validate
-tsc.validate(tscCode); // { valid, errors, issues }
-zpl.validate(zplCode); // { valid, errors, issues }
-```
-
-Available modules: `tsc`, `zpl`, `epl`, `cpcl`, `dpl`, `sbpl`, `escpos`, `starprnt`, `ipl`
-
-### Tree Shaking (low-level)
-
-Individual functions are also available as separate entry points:
-
-```ts
-import { compileToTSC } from "portakal/tsc";
-import { imageToMonochrome } from "portakal/image";
-import { formatPair } from "portakal/receipt";
-import { convert } from "portakal";
-import { markup } from "portakal";
-```
-
-### Software-rendered barcode/QR (with etiket)
-
-For pixel-perfect output, styled QR codes, or when the printer doesn't support a format natively:
-
-```sh
-npm install portakal etiket
-```
-
-```ts
-import { label } from "portakal";
 import { barcodePNG, qrcodePNG } from "etiket";
 
-// etiket renders barcode/QR as PNG → portakal sends it as an image to the printer
-const cmd = label({ width: 40, height: 30, unit: "mm" })
+const myLabel = label({ width: 40, height: 30, unit: "mm" })
   .text("Product Label", { x: 10, y: 5 })
   .image(barcodePNG("123456789", { type: "code128" }), { x: 10, y: 40, width: 200 })
-  .image(qrcodePNG("https://example.com"), { x: 220, y: 40, width: 80 })
-  .toZPL();
+  .image(qrcodePNG("https://example.com"), { x: 220, y: 40, width: 80 });
+
+const code = tsc.compile(myLabel);
 ```
 
-### When to use which?
-
-|                                       | Printer-native (`.barcode()` / `.qrcode()`) | Software-rendered (`.image()` + `etiket`) |
-| :------------------------------------ | :------------------------------------------ | :---------------------------------------- |
-| **Dependencies**                      | None                                        | `etiket` (you install it)                 |
-| **Speed**                             | Fast (only sends command text)              | Slower (sends pixel data)                 |
-| **Data size**                         | Small (~50 bytes)                           | Larger (bitmap data)                      |
-| **Consistency**                       | Varies by printer model                     | Identical on every printer                |
-| **Format support**                    | Depends on printer (10-20 types)            | 40+ barcode types, styled QR              |
-| **Styled QR** (dots, gradients, logo) | Not possible                                | Full support via etiket                   |
-| **Works on cheap printers**           | May not support QR/PDF417                   | Always works (it's just an image)         |
-| **Best for**                          | Simple labels, fast printing                | Pixel-perfect, guaranteed output          |
+| **Best for** | Simple labels, fast printing | Pixel-perfect, guaranteed output |
 
 ## API
 
@@ -209,56 +160,6 @@ builder.text("Hello", {
   reverse: false, // White on black
   align: "center", // "left" | "center" | "right"
   maxWidth: 300, // Word-wrap width in dots
-});
-```
-
-### `.barcode(data, options)`
-
-Printer-native barcode (uses the printer's built-in encoder):
-
-```ts
-builder.barcode("123456789", {
-  type: "code128", // Symbology (see table below)
-  x: 10,
-  y: 50, // Position
-  height: 80, // Bar height in dots
-  narrowWidth: 2, // Narrow bar width
-  wideWidth: 4, // Wide bar width
-  readable: true, // Show human-readable text
-  readablePosition: "below", // "none" | "above" | "below" | "both"
-  rotation: 0, // 0 | 90 | 180 | 270
-});
-```
-
-**Supported barcode types:**
-
-| Type                                 | Description            |
-| :----------------------------------- | :--------------------- |
-| `code128`                            | Code 128 (auto subset) |
-| `code128a` / `code128b` / `code128c` | Code 128 subsets       |
-| `code39`                             | Code 39                |
-| `code93`                             | Code 93                |
-| `ean13` / `ean8`                     | EAN-13 / EAN-8         |
-| `upca` / `upce`                      | UPC-A / UPC-E          |
-| `itf` / `itf14`                      | Interleaved 2 of 5     |
-| `codabar`                            | Codabar                |
-| `msi`                                | MSI Plessey            |
-| `plessey`                            | Plessey                |
-| `code11`                             | Code 11                |
-| `postnet` / `planet`                 | USPS Postnet / Planet  |
-| `gs1_128`                            | GS1-128                |
-| `gs1_databar`                        | GS1 DataBar            |
-
-### `.qrcode(data, options?)`
-
-```ts
-builder.qrcode("https://example.com", {
-  x: 10,
-  y: 100, // Position
-  ecc: "M", // "L" | "M" | "Q" | "H"
-  size: 6, // Module size 1-10
-  model: 2, // QR model 1 | 2
-  rotation: 0, // 0 | 90 | 180 | 270
 });
 ```
 
@@ -302,20 +203,16 @@ builder.raw("^FO10,10^FDCustom^FS"); // ZPL
 builder.raw(new Uint8Array([0x1b, 0x70, 0x00, 0x32, 0x32])); // ESC/POS cash drawer
 ```
 
-### Output Methods
+### Language Module Methods
 
-| Method          | Output       | Target                          |
-| :-------------- | :----------- | :------------------------------ |
-| `.toTSC()`      | `string`     | TSC/TSPL2 label printers        |
-| `.toZPL()`      | `string`     | Zebra ZPL II printers           |
-| `.toEPL()`      | `string`     | Eltron EPL2 printers            |
-| `.toCPCL()`     | `string`     | Zebra mobile printers           |
-| `.toDPL()`      | `string`     | Honeywell/Datamax printers      |
-| `.toSBPL()`     | `string`     | SATO printers                   |
-| `.toESCPOS()`   | `Uint8Array` | ESC/POS receipt printers        |
-| `.toStarPRNT()` | `Uint8Array` | Star Micronics printers         |
-| `.toIPL()`      | `string`     | Intermec/Honeywell printers     |
-| `.toPreview()`  | `string`     | SVG preview (no printer needed) |
+Each language module (`tsc`, `zpl`, `epl`, `cpcl`, `dpl`, `sbpl`, `escpos`, `starprnt`, `ipl`) has:
+
+| Method                | Output                   | Description                              |
+| :-------------------- | :----------------------- | :--------------------------------------- |
+| `lang.compile(label)` | `string` or `Uint8Array` | Compile to printer commands              |
+| `lang.preview(label)` | `string`                 | SVG preview with language-specific fonts |
+| `lang.parse(code)`    | `object`                 | Parse printer commands → structured data |
+| `lang.validate(code)` | `object`                 | Validate commands for errors/warnings    |
 
 ### Image Processing
 
@@ -328,7 +225,7 @@ const bitmap = imageToMonochrome(rgbaPixels, width, height, {
   dither: "floyd-steinberg", // "threshold" | "floyd-steinberg" | "atkinson" | "ordered"
 });
 
-label({ width: 40, height: 30 }).image(bitmap, { x: 10, y: 10 }).toTSC();
+tsc.compile(label({ width: 40, height: 30 }).image(bitmap, { x: 10, y: 10 }));
 ```
 
 ### Receipt Layout
@@ -434,24 +331,23 @@ findByVendorId(0x04b8); // All Epson printers
 portakal generates commands only — it does **not** handle printer connections. Send the output over any transport you choose:
 
 ```ts
-import { label } from "portakal";
+import { label } from "portakal/core";
+import { tsc } from "portakal/lang/tsc";
+import { escpos } from "portakal/lang/escpos";
 import net from "node:net";
 
-const commands = label({ width: 40, height: 30 }).text("Hello", { x: 10, y: 10 }).toTSC();
+const myLabel = label({ width: 40, height: 30 }).text("Hello", { x: 10, y: 10 });
+const commands = tsc.compile(myLabel);
 
 // TCP (port 9100)
 const socket = net.createConnection({ host: "192.168.1.100", port: 9100 });
 socket.write(commands);
 socket.end();
 
-// USB (via serialport)
-import { SerialPort } from "serialport";
-const port = new SerialPort({ path: "/dev/usb/lp0", baudRate: 9600 });
-port.write(commands);
-
 // ESC/POS (binary) over WebUSB
-const escpos = label({ width: 80 }).text("Receipt").toESCPOS();
-await usbDevice.transferOut(endpointNumber, escpos);
+const receipt = label({ width: 80 }).text("Receipt");
+const bytes = escpos.compile(receipt);
+await usbDevice.transferOut(endpointNumber, bytes);
 ```
 
 ## Comparison
@@ -490,7 +386,7 @@ await usbDevice.transferOut(endpointNumber, escpos);
 - Fluent builder API — one label definition compiles to any language
 - **Image processing** — RGBA → monochrome with 4 dithering algorithms (Floyd-Steinberg, Atkinson, ordered, threshold)
 - **Receipt layout engine** — same-line left+right alignment, tables, word-wrap, separators
-- **SVG preview** — `.toPreview()` renders labels without a physical printer
+- **SVG preview** — `lang.preview(label)` renders labels without a physical printer
 - **9 parsers** — reverse-parse printer commands back to structured data (TSC, ZPL, EPL, CPCL, ESC/POS, DPL, SBPL, Star PRNT, IPL)
 - Drawing primitives — box, line, circle, diagonal
 - Raw command passthrough for advanced/unsupported features

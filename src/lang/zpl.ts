@@ -4,7 +4,7 @@
  */
 
 import type { LabelBuilder } from "../builder";
-import type { LabelElement, ResolvedLabel } from "../types";
+import type { ResolvedLabel } from "../types";
 import { compileToZPL } from "../languages/zpl";
 import { parseZPL } from "../parsers/zpl";
 import { validate } from "../validate";
@@ -49,18 +49,6 @@ function zplFontSize(font: string | undefined, size: number | undefined, yScale?
   if (f && size) return f.h * size;
   if (f) return f.h;
   return size ? size * 12 : 18;
-}
-
-function zplCharWidth(font: string | undefined, size: number | undefined, xScale?: number): number {
-  if (xScale && xScale > 10) {
-    // Font 0 (proportional): avg glyph advance ≈ 0.52 × width param
-    // Bitmap fonts (A-H): monospace, char advance = width param directly
-    return isProportionalFont(font) ? xScale * 0.52 : xScale;
-  }
-  const f = ZPL_FONTS[(font ?? "0").toUpperCase()];
-  if (f && size) return f.w * size;
-  if (f) return f.w;
-  return size ? size * 7 : 10;
 }
 
 /** Baseline offset from top of character cell. */
@@ -243,5 +231,4 @@ export const zpl = {
   validate(code: string) {
     return validate(code, "zpl");
   },
-
 };

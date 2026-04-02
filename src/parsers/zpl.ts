@@ -134,7 +134,7 @@ export function parseZPL(code: string): ZPLParseResult {
   let currentFont = "0";
   let currentFontH = 30;
   let currentFontW = 30;
-  let currentOrientation = "N";
+  let _currentOrientation = "N";
   let fieldReverse = false;
   let fieldData = "";
   let barcodeType = "";
@@ -143,7 +143,7 @@ export function parseZPL(code: string): ZPLParseResult {
   let fieldBaseline = false;
   // ^FB state
   let fieldBlockWidth = 0;
-  let fieldBlockMaxLines = 1;
+  let _fieldBlockMaxLines = 1;
   let fieldBlockJustify = "L";
 
   for (const cmd of commands) {
@@ -153,7 +153,7 @@ export function parseZPL(code: string): ZPLParseResult {
       const parts = cmd.rawParams.split(",");
       if (parts[0]) {
         const o = parts[0].replace(/[^NRIB]/g, "");
-        if (o) currentOrientation = o;
+        if (o) _currentOrientation = o;
       }
       if (parts[1]) {
         currentFontH = Number(parts[1]) || currentFontH;
@@ -293,11 +293,12 @@ export function parseZPL(code: string): ZPLParseResult {
             barcodeType = "";
           } else {
             // Text field — store font and dot dimensions for accurate preview
-            const align = fieldBlockWidth > 0 && fieldBlockJustify === "C"
-              ? "center" as const
-              : fieldBlockWidth > 0 && fieldBlockJustify === "R"
-                ? "right" as const
-                : undefined;
+            const align =
+              fieldBlockWidth > 0 && fieldBlockJustify === "C"
+                ? ("center" as const)
+                : fieldBlockWidth > 0 && fieldBlockJustify === "R"
+                  ? ("right" as const)
+                  : undefined;
             elements.push({
               type: "text",
               content: fieldData,
@@ -339,7 +340,7 @@ export function parseZPL(code: string): ZPLParseResult {
 
       case "^FW":
         // Field default orientation
-        if (cmd.params[0]) currentOrientation = cmd.params[0];
+        if (cmd.params[0]) _currentOrientation = cmd.params[0];
         break;
 
       case "^FX":
@@ -371,7 +372,7 @@ export function parseZPL(code: string): ZPLParseResult {
       case "^FB":
         // Field block: ^FBwidth,maxLines,lineSpacing,justify,hangingIndent
         fieldBlockWidth = Number(cmd.params[0] ?? 0);
-        fieldBlockMaxLines = Number(cmd.params[1] ?? 1);
+        _fieldBlockMaxLines = Number(cmd.params[1] ?? 1);
         fieldBlockJustify = (cmd.params[3] ?? "L").toUpperCase();
         break;
 

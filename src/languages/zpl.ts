@@ -62,7 +62,8 @@ function compileElement(el: LabelElement): string {
       const radiusDots = o.radius ?? 0;
       // Convert dot radius to ZPL 0-8 index: index = radius / (shorter_side/2) * 8
       const maxR = Math.min(o.width, o.height) / 2;
-      const rIndex = maxR > 0 && radiusDots > 0 ? Math.min(8, Math.round((radiusDots / maxR) * 8)) : 0;
+      const rIndex =
+        maxR > 0 && radiusDots > 0 ? Math.min(8, Math.round((radiusDots / maxR) * 8)) : 0;
       return `^FO${o.x},${o.y}^GB${o.width},${o.height},${t},B,${rIndex}^FS`;
     }
 

@@ -76,21 +76,21 @@ const myLabel = label({ width: 40, height: 30, unit: "mm" })
   .image(buffer, { x: 200, y: 10, width: 100 })
   .print(2);
 
-const code = zpl.compile(myLabel);   // ZPL II commands
-const svg  = zpl.preview(myLabel);   // SVG preview with ZPL font metrics
+const code = zpl.compile(myLabel); // ZPL II commands
+const svg = zpl.preview(myLabel); // SVG preview with ZPL font metrics
 ```
 
 ### Available language modules
 
 ```ts
-import { tsc } from "portakal/lang/tsc";       // TSC/TSPL2
-import { zpl } from "portakal/lang/zpl";       // Zebra ZPL II
-import { epl } from "portakal/lang/epl";       // Eltron EPL2
+import { tsc } from "portakal/lang/tsc"; // TSC/TSPL2
+import { zpl } from "portakal/lang/zpl"; // Zebra ZPL II
+import { epl } from "portakal/lang/epl"; // Eltron EPL2
 import { escpos } from "portakal/lang/escpos"; // ESC/POS
-import { cpcl } from "portakal/lang/cpcl";     // Comtec CPCL
-import { dpl } from "portakal/lang/dpl";       // Datamax DPL
-import { ipl } from "portakal/lang/ipl";       // Intermec IPL
-import { sbpl } from "portakal/lang/sbpl";     // SATO SBPL
+import { cpcl } from "portakal/lang/cpcl"; // Comtec CPCL
+import { dpl } from "portakal/lang/dpl"; // Datamax DPL
+import { ipl } from "portakal/lang/ipl"; // Intermec IPL
+import { sbpl } from "portakal/lang/sbpl"; // SATO SBPL
 import { starprnt } from "portakal/lang/starprnt"; // Star PRNT
 ```
 

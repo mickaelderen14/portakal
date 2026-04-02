@@ -18,6 +18,9 @@
   <a href="https://portakal.productdevbook.com">Playground</a> · <a href="https://github.com/productdevbook/portakal">GitHub</a> · <a href="https://npmjs.com/package/portakal">npm</a>
 </p>
 
+> [!IMPORTANT]
+> **We need your help testing!** If you have a thermal printer, please try portakal and [report any differences](https://github.com/productdevbook/portakal/issues/new) between our preview and your actual printed output. Even "looks correct" confirmations help. See [Help Us Test](#help-us-test--real-printer-output-needed) below.
+
 > [!NOTE]
 > portakal has **two ways** to print barcodes and QR codes:
 >
@@ -448,16 +451,16 @@ Paste this into the [Playground](https://portakal.productdevbook.com) (Validate 
 
 ### What we're looking for
 
-| Area | What to check |
-|:-----|:-------------|
-| **Text positioning** | Are texts at the correct x,y? Do they overflow? |
-| **Font sizes** | Does `^CF0,60` look the same size as the real printer? |
-| **Font rendering** | Font 0 should be proportional (Helvetica-like), Font A should be monospace |
-| **^FR reverse (XOR)** | The Intershipping logo (3 overlapping boxes) should show black L-shape + white area + small black square |
-| **Barcodes** | Correct height from `^BY`? Correct width? Readable interpretation line? |
-| **Box/line thickness** | Does `^GB` draw borders inward? Correct corner radius? |
-| **^LH, ^LS, ^LT offsets** | Do label home / shift / top offsets apply correctly? |
-| **ESC/POS receipts** | Alignment, bold, text sizing on Epson/Star/Bixolon |
+| Area                      | What to check                                                                                            |
+| :------------------------ | :------------------------------------------------------------------------------------------------------- |
+| **Text positioning**      | Are texts at the correct x,y? Do they overflow?                                                          |
+| **Font sizes**            | Does `^CF0,60` look the same size as the real printer?                                                   |
+| **Font rendering**        | Font 0 should be proportional (Helvetica-like), Font A should be monospace                               |
+| **^FR reverse (XOR)**     | The Intershipping logo (3 overlapping boxes) should show black L-shape + white area + small black square |
+| **Barcodes**              | Correct height from `^BY`? Correct width? Readable interpretation line?                                  |
+| **Box/line thickness**    | Does `^GB` draw borders inward? Correct corner radius?                                                   |
+| **^LH, ^LS, ^LT offsets** | Do label home / shift / top offsets apply correctly?                                                     |
+| **ESC/POS receipts**      | Alignment, bold, text sizing on Epson/Star/Bixolon                                                       |
 
 Even a "looks correct" confirmation is helpful. Every report makes the SDK more reliable for everyone.
 

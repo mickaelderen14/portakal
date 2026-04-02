@@ -1,5 +1,14 @@
 import type { LabelElement, ResolvedLabel } from "./types";
 
+/**
+ * SVG preview renderer — renders label elements to SVG string.
+ * Font sizes and rendering rules based on official spec research:
+ * - ZPL: Zebra ZPL II Programming Guide, Labelary rendering reference
+ * - TSC: TSPL/TSPL2 Programming Manual
+ * - EPL: EPL2 Programmer's Manual
+ * - CPCL: Zebra CPCL Font Manual
+ */
+
 function escapeXml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -8,8 +17,25 @@ function escapeXml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function fontSize(size: number): number {
-  return Math.max(10, size * 12);
+/**
+ * Calculate font pixel height from size and yScale.
+ *
+ * Priority:
+ * 1. yScale (raw dot height from parser, e.g., ZPL ^CF height) — use directly
+ * 2. size as multiplier (TSC/EPL x_mul/y_mul) — multiply base font height
+ */
+function calcFontSize(size: number, yScale?: number): number {
+  if (yScale && yScale > 10) return yScale;
+  // Default: size is a multiplier on ~12 dot base height
+  return Math.max(8, size * 12);
+}
+
+/**
+ * Estimate text width in dots based on font size and content length.
+ * Uses average character width ratio of 0.6 for monospace fonts.
+ */
+function estimateTextWidth(content: string, fontSize: number): number {
+  return content.length * fontSize * 0.6;
 }
 
 function renderElement(el: LabelElement): string {
@@ -18,13 +44,13 @@ function renderElement(el: LabelElement): string {
       const o = el.options;
       const x = o.x ?? 0;
       const y = o.y ?? 0;
-      const fs = fontSize(o.size ?? 1);
+      const fs = calcFontSize(o.size ?? 1, o.yScale);
       const weight = o.bold ? "bold" : "normal";
       const decoration = o.underline ? ' text-decoration="underline"' : "";
       const transform = o.rotation ? ` transform="rotate(${o.rotation} ${x} ${y})"` : "";
 
       if (o.reverse) {
-        const textW = el.content.length * fs * 0.6;
+        const textW = estimateTextWidth(el.content, fs);
         const textH = fs * 1.2;
         return (
           `<rect x="${x - 2}" y="${y - 2}" width="${textW + 4}" height="${textH + 4}" fill="#000"/>` +
@@ -66,7 +92,14 @@ function renderElement(el: LabelElement): string {
       const o = el.options;
       const t = o.thickness ?? 1;
       const rx = o.radius ?? 0;
-      return `<rect x="${o.x}" y="${o.y}" width="${o.width}" height="${o.height}" fill="none" stroke="#000" stroke-width="${t}" rx="${rx}" ry="${rx}"/>`;
+
+      // Spec: filled when thickness >= min(width, height)
+      if (t >= Math.min(o.width, o.height)) {
+        return `<rect x="${o.x}" y="${o.y}" width="${o.width}" height="${o.height}" fill="#000" rx="${rx}" ry="${rx}"/>`;
+      }
+
+      // Outline — border draws inward
+      return `<rect x="${o.x + t / 2}" y="${o.y + t / 2}" width="${o.width - t}" height="${o.height - t}" fill="none" stroke="#000" stroke-width="${t}" rx="${rx}" ry="${rx}"/>`;
     }
 
     case "line": {
@@ -79,7 +112,10 @@ function renderElement(el: LabelElement): string {
       const o = el.options;
       const t = o.thickness ?? 1;
       const r = o.diameter / 2;
-      return `<circle cx="${o.x + r}" cy="${o.y + r}" r="${r}" fill="none" stroke="#000" stroke-width="${t}"/>`;
+      if (t >= r) {
+        return `<circle cx="${o.x + r}" cy="${o.y + r}" r="${r}" fill="#000"/>`;
+      }
+      return `<circle cx="${o.x + r}" cy="${o.y + r}" r="${r - t / 2}" fill="none" stroke="#000" stroke-width="${t}"/>`;
     }
 
     case "ellipse": {

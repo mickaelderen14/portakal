@@ -68,7 +68,7 @@ describe("SVG preview renderer", () => {
       .circle({ x: 100, y: 100, diameter: 60, thickness: 2 })
       .toPreview();
     expect(svg).toContain("<circle");
-    expect(svg).toContain('r="30"');
+    expect(svg).toContain('r="29"');
   });
 
   it("renders monochrome bitmap image", () => {

@@ -265,7 +265,9 @@ export function parseZPL(code: string): ZPLParseResult {
               options: {
                 x: fieldX,
                 y: fieldY,
-                size: Math.round(currentFontH / 30) || 1,
+                size: Math.max(1, Math.round(currentFontH / 12)),
+                xScale: currentFontW,
+                yScale: currentFontH,
                 reverse: fieldReverse || undefined,
               },
             });

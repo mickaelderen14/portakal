@@ -47,6 +47,10 @@ export type { ConvertResult, SourceLanguage, TargetLanguage } from "./convert";
 export { validate } from "./validate";
 export { markup } from "./markup";
 export type { ValidationIssue, ValidationResult } from "./validate";
+
+// Drizzle-style per-language modules (tree-shakeable)
+export { tsc } from "./lang/tsc";
+export { zpl } from "./lang/zpl";
 export type {
   PrinterTransport,
   ConnectionState,

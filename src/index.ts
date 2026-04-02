@@ -45,6 +45,7 @@ export { parseIPL } from "./parsers/ipl";
 export { convert, SUPPORTED_SOURCES, SUPPORTED_TARGETS } from "./convert";
 export type { ConvertResult, SourceLanguage, TargetLanguage } from "./convert";
 export { validate } from "./validate";
+export { markup } from "./markup";
 export type { ValidationIssue, ValidationResult } from "./validate";
 export type {
   PrinterTransport,

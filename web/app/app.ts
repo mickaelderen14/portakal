@@ -1,4 +1,13 @@
-import { label, formatPair, separator, type LabelBuilder, type MonochromeBitmap } from "portakal";
+import {
+  label,
+  formatPair,
+  separator,
+  renderPreview,
+  parseTSC,
+  type LabelBuilder,
+  type MonochromeBitmap,
+  type ResolvedLabel,
+} from "portakal";
 import {
   encodeCode128,
   encodeEAN13,
@@ -398,11 +407,32 @@ export function setupApp(): void {
   }
 
   for (const input of $$("input, select, textarea")) {
-    // Skip output textareas — don't re-generate when user edits output
     if (input.id === "output-code" || input.id === "receipt-output") continue;
     input.addEventListener("input", update);
     input.addEventListener("change", update);
   }
+
+  // When user edits the output textarea, parse it and update preview
+  $("#output-code").addEventListener("input", () => {
+    const code = ($("#output-code") as HTMLTextAreaElement).value;
+    try {
+      const parsed = parseTSC(code);
+      const resolved: ResolvedLabel = {
+        widthDots: parsed.widthDots,
+        heightDots: parsed.heightDots,
+        dpi: 203,
+        gapDots: 24,
+        speed: 4,
+        density: 8,
+        direction: 0,
+        copies: 1,
+        elements: parsed.elements,
+      };
+      $("#preview-container").innerHTML = renderPreview(resolved);
+    } catch {
+      // ignore parse errors while typing
+    }
+  });
 
   generate();
   generateReceipt();

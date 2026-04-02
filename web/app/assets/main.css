@@ -316,7 +316,6 @@ textarea.output-editable {
   resize: vertical;
   border: 1px solid var(--border);
   cursor: text;
-  transition: border-color var(--transition);
 }
 
 textarea.output-editable:focus {

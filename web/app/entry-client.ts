@@ -1,3 +1,7 @@
 import { setupApp } from "./app.ts";
 
-setupApp();
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", setupApp);
+} else {
+  setupApp();
+}

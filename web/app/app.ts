@@ -11,6 +11,8 @@ import {
   parseDPL,
   parseSBPL,
   parseIPL,
+  convert,
+  validate,
   type LabelBuilder,
   type MonochromeBitmap,
   type ResolvedLabel,
@@ -579,10 +581,22 @@ export function setupApp(): void {
         elements,
       };
       $("#v-preview").innerHTML = renderPreview(resolved);
+
+      // Validate
+      const validation = validate(code, lang as any);
+      if (validation.issues.length > 0) {
+        let vText = "";
+        for (const issue of validation.issues) {
+          const icon = issue.level === "error" ? "✗" : issue.level === "warning" ? "⚠" : "ℹ";
+          vText += `${icon} ${issue.message}\n`;
+        }
+        $("#v-warnings").textContent = vText;
+      }
     } catch (e: any) {
       $("#v-result").textContent = `Parse error: ${e.message}`;
       $("#v-warnings").textContent = "";
       $("#v-preview").innerHTML = "";
+      ($("#v-convert-section") as HTMLElement).style.display = "none";
     }
   }
 
@@ -597,15 +611,70 @@ export function setupApp(): void {
     setTimeout(() => (btn.textContent = "Copy"), 1500);
   });
 
-  // Load example into validate on first visit
-  const vCode = $("#v-code") as HTMLTextAreaElement;
-  if (!vCode.value && vCode.placeholder) {
-    vCode.value = vCode.placeholder;
+  // Convert tab
+  function runConvert(): void {
+    const code = ($("#c-code") as HTMLTextAreaElement).value;
+    const from = val("#c-from");
+    const to = val("#c-to");
+    if (!code.trim()) {
+      $("#c-output").textContent = "";
+      $("#c-preview-src").innerHTML = "";
+      $("#c-stats").textContent = "";
+      return;
+    }
+
+    try {
+      const result = convert(code, from as any, to as any);
+      const output =
+        result.output instanceof Uint8Array ? formatHex(result.output) : (result.output as string);
+
+      $("#c-output").textContent = output;
+      $("#c-stats").textContent =
+        `${from.toUpperCase()} → ${to.toUpperCase()} · ${result.elements.length} elements · ${result.widthDots}×${result.heightDots}`;
+
+      // Source preview
+      const resolved: ResolvedLabel = {
+        widthDots: result.widthDots,
+        heightDots: result.heightDots,
+        dpi: 203,
+        gapDots: 24,
+        speed: 4,
+        density: 8,
+        direction: 0,
+        copies: 1,
+        elements: result.elements,
+      };
+      $("#c-preview-src").innerHTML = renderPreview(resolved);
+    } catch (e: any) {
+      $("#c-output").textContent = `Conversion error: ${e.message}`;
+      $("#c-preview-src").innerHTML = "";
+      $("#c-stats").textContent = "";
+    }
   }
+
+  $("#c-code").addEventListener("input", runConvert);
+  $("#c-from").addEventListener("change", runConvert);
+  $("#c-to").addEventListener("change", runConvert);
+
+  $("#btn-copy-convert").addEventListener("click", () => {
+    const text = $("#c-output").textContent ?? "";
+    navigator.clipboard.writeText(text);
+    const btn = $("#btn-copy-convert");
+    btn.textContent = "Copied!";
+    setTimeout(() => (btn.textContent = "Copy"), 1500);
+  });
+
+  // Load examples on first visit
+  const vCode = $("#v-code") as HTMLTextAreaElement;
+  if (!vCode.value && vCode.placeholder) vCode.value = vCode.placeholder;
+
+  const cCode = $("#c-code") as HTMLTextAreaElement;
+  if (!cCode.value && cCode.placeholder) cCode.value = cCode.placeholder;
 
   generate();
   generateReceipt();
   runValidate();
+  runConvert();
 }
 
 function generateReceipt(): void {

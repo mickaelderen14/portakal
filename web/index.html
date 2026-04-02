@@ -28,6 +28,7 @@
         <button class="tab active" data-tab="label" role="tab">Label</button>
         <button class="tab" data-tab="receipt" role="tab">Receipt</button>
         <button class="tab" data-tab="validate" role="tab">Validate</button>
+        <button class="tab" data-tab="convert" role="tab">Convert</button>
       </nav>
 
       <section class="panel active" data-panel="label">
@@ -513,7 +514,7 @@ Coffee,2,7.00</textarea
       <section class="panel" data-panel="validate">
         <div class="validate-input">
           <div class="validate-header">
-            <h3 class="validate-title">Paste &amp; Validate Printer Commands</h3>
+            <h3 class="validate-title">Paste &amp; Validate</h3>
             <select id="v-lang" class="validate-lang">
               <option value="tsc" selected>TSC/TSPL2</option>
               <option value="zpl">ZPL II</option>
@@ -574,6 +575,71 @@ PRINT 1'
                 id="v-warnings"
                 class="output-code"
                 style="min-height: 40px; max-height: 100px; color: #fbbf24"
+              ></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ CONVERT ═══════ -->
+      <section class="panel" data-panel="convert">
+        <div class="validate-input">
+          <div class="validate-header">
+            <h3 class="validate-title">Convert Between Languages</h3>
+            <div style="display: flex; gap: 0.5rem; align-items: center">
+              <select id="c-from" class="validate-lang">
+                <option value="tsc" selected>TSC/TSPL2</option>
+                <option value="zpl">ZPL II</option>
+                <option value="epl">EPL2</option>
+                <option value="cpcl">CPCL</option>
+                <option value="dpl">DPL</option>
+                <option value="sbpl">SBPL</option>
+                <option value="ipl">IPL</option>
+              </select>
+              <span style="color: var(--accent); font-size: 0.85rem; font-weight: 700">→</span>
+              <select id="c-to" class="validate-lang">
+                <option value="tsc">TSC</option>
+                <option value="zpl" selected>ZPL</option>
+                <option value="epl">EPL</option>
+                <option value="cpcl">CPCL</option>
+                <option value="dpl">DPL</option>
+                <option value="sbpl">SBPL</option>
+                <option value="ipl">IPL</option>
+                <option value="escpos">ESC/POS</option>
+                <option value="starprnt">Star PRNT</option>
+              </select>
+            </div>
+          </div>
+          <textarea
+            id="c-code"
+            class="validate-code"
+            rows="8"
+            spellcheck="false"
+            placeholder='SIZE 40 mm,30 mm
+GAP 3 mm,0 mm
+CLS
+TEXT 10,10,"2",0,2,2,"Hello World"
+BOX 5,5,315,235,2
+PRINT 1'
+          ></textarea>
+        </div>
+        <div class="validate-output">
+          <div class="validate-left">
+            <div class="preview-section">
+              <div class="preview-header"><h3>Source Preview</h3></div>
+              <div id="c-preview-src" class="preview-canvas"></div>
+            </div>
+          </div>
+          <div class="validate-right">
+            <div class="code-section">
+              <div class="output-header">
+                <span id="c-stats" class="validate-stats"></span>
+                <button id="btn-copy-convert" class="btn">Copy</button>
+              </div>
+              <pre
+                id="c-output"
+                class="output-code"
+                style="min-height: 200px; max-height: 400px"
               ></pre>
             </div>
           </div>

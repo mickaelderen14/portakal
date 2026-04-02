@@ -4,7 +4,7 @@
  */
 
 import type { LabelBuilder } from "../builder";
-import type { ResolvedLabel } from "../types";
+import type { LabelElement, ResolvedLabel } from "../types";
 import { compileToZPL } from "../languages/zpl";
 import { parseZPL } from "../parsers/zpl";
 import { validate } from "../validate";

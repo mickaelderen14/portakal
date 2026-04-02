@@ -24,12 +24,25 @@ import { compileToSBPL } from "./languages/sbpl";
 import { compileToStarPRNT } from "./languages/starprnt";
 import { compileToIPL } from "./languages/ipl";
 import { renderPreview } from "./preview";
+import { getProfile } from "./profiles";
 
 export class LabelBuilder {
   private readonly config: LabelConfig;
   private readonly elements: LabelElement[] = [];
 
   constructor(config: LabelConfig) {
+    // Apply printer profile defaults if specified
+    if (config.printer) {
+      const profile = getProfile(config.printer);
+      if (profile) {
+        config = {
+          ...config,
+          width: config.width || profile.paperWidth,
+          dpi: config.dpi ?? profile.dpi,
+          unit: config.unit ?? "mm",
+        };
+      }
+    }
     if (!config.width || config.width <= 0) {
       throw new InvalidConfigError("Label width must be a positive number");
     }

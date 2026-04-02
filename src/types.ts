@@ -12,6 +12,8 @@ export type DitherAlgorithm = "threshold" | "floyd-steinberg" | "atkinson" | "or
 
 /** Label configuration */
 export interface LabelConfig {
+  /** Printer profile ID (e.g., "epson-tm-t88vi", "zebra-zd420"). Overrides width, dpi, etc. */
+  printer?: string;
   /** Label width */
   width: number;
   /** Label height (optional for receipt/continuous mode) */

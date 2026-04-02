@@ -536,15 +536,13 @@ export function setupApp(): void {
       ).length;
       const total = commands.length;
 
-      // Build result summary
-      let result = `Language: ${lang.toUpperCase()}\n`;
-      result += `Commands: ${total}\n`;
-      result += `Elements: ${elements.length}\n`;
-      result += `Label: ${widthDots}×${heightDots} dots\n`;
-      if (unknowns > 0) {
-        result += `Unknown: ${unknowns} (${Math.round((unknowns / total) * 100)}%)\n`;
-      }
-      result += `\n--- Commands ---\n`;
+      // Stats header
+      let statsText = `${lang.toUpperCase()} · ${total} commands · ${elements.length} elements · ${widthDots}×${heightDots}`;
+      if (unknowns > 0) statsText += ` · ${unknowns} unknown`;
+      $("#v-stats").textContent = statsText;
+
+      // Build result detail
+      let result = "";
       for (const cmd of commands) {
         const name = cmd.cmd ?? cmd.code ?? cmd.type ?? cmd.name ?? "?";
         result += `${name}`;
@@ -599,8 +597,15 @@ export function setupApp(): void {
     setTimeout(() => (btn.textContent = "Copy"), 1500);
   });
 
+  // Load example into validate on first visit
+  const vCode = $("#v-code") as HTMLTextAreaElement;
+  if (!vCode.value && vCode.placeholder) {
+    vCode.value = vCode.placeholder;
+  }
+
   generate();
   generateReceipt();
+  runValidate();
 }
 
 function generateReceipt(): void {

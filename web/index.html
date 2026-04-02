@@ -511,65 +511,49 @@ Coffee,2,7.00</textarea
       </section>
       <!-- ═══════ VALIDATE ═══════ -->
       <section class="panel" data-panel="validate">
-        <div class="split">
-          <div class="controls" style="min-width: 100%">
-            <div class="ctrl-section">
-              <div class="ctrl-header">
-                <h3>Paste Printer Commands</h3>
-              </div>
-              <div class="ctrl-body" style="display: block">
-                <div class="field full">
-                  <label for="v-lang">Language</label>
-                  <select id="v-lang">
-                    <option value="tsc" selected>TSC/TSPL2</option>
-                    <option value="zpl">ZPL II</option>
-                    <option value="epl">EPL2</option>
-                    <option value="cpcl">CPCL</option>
-                    <option value="dpl">DPL</option>
-                    <option value="sbpl">SBPL</option>
-                    <option value="ipl">IPL</option>
-                  </select>
-                </div>
-                <div class="field full">
-                  <label for="v-code">Commands</label>
-                  <textarea
-                    id="v-code"
-                    rows="12"
-                    spellcheck="false"
-                    placeholder="Paste your TSC, ZPL, EPL, CPCL, DPL, SBPL, or IPL commands here..."
-                  ></textarea>
-                </div>
-              </div>
-            </div>
+        <div class="validate-input">
+          <div class="validate-header">
+            <h3 class="validate-title">Paste &amp; Validate Printer Commands</h3>
+            <select id="v-lang" class="validate-lang">
+              <option value="tsc" selected>TSC/TSPL2</option>
+              <option value="zpl">ZPL II</option>
+              <option value="epl">EPL2</option>
+              <option value="cpcl">CPCL</option>
+              <option value="dpl">DPL</option>
+              <option value="sbpl">SBPL</option>
+              <option value="ipl">IPL</option>
+            </select>
           </div>
+          <textarea
+            id="v-code"
+            class="validate-code"
+            rows="8"
+            spellcheck="false"
+            placeholder='SIZE 40 mm,30 mm
+GAP 3 mm,0 mm
+CLS
+TEXT 10,10,"2",0,2,2,"Hello World"
+BOX 5,5,315,235,2
+PRINT 1'
+          ></textarea>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem">
-          <div class="output">
+        <div class="validate-output">
+          <div class="validate-left">
             <div class="preview-section">
               <div class="preview-header"><h3>Preview</h3></div>
-              <div id="v-preview" class="preview-canvas" style="min-height: 150px"></div>
+              <div id="v-preview" class="preview-canvas"></div>
             </div>
           </div>
-          <div class="output">
+          <div class="validate-right">
             <div class="code-section">
               <div class="output-header">
-                <h3
-                  style="
-                    font-size: 0.65rem;
-                    color: var(--text-dim);
-                    text-transform: uppercase;
-                    letter-spacing: 0.08em;
-                    font-weight: 700;
-                  "
-                >
-                  Parse Result
-                </h3>
+                <span id="v-stats" class="validate-stats"></span>
                 <button id="btn-copy-validate" class="btn">Copy</button>
               </div>
               <pre
                 id="v-result"
                 class="output-code"
-                style="min-height: 200px; max-height: 400px"
+                style="min-height: 200px; max-height: 350px"
               ></pre>
             </div>
             <div class="code-section">
@@ -589,7 +573,7 @@ Coffee,2,7.00</textarea
               <pre
                 id="v-warnings"
                 class="output-code"
-                style="min-height: 40px; max-height: 120px; color: #fbbf24"
+                style="min-height: 40px; max-height: 100px; color: #fbbf24"
               ></pre>
             </div>
           </div>

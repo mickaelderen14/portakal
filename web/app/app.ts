@@ -29,7 +29,8 @@ function checked(id: string): boolean {
   return ($(id) as HTMLInputElement).checked;
 }
 
-let currentLang: "tsc" | "zpl" | "epl" | "cpcl" | "dpl" | "sbpl" | "escpos" | "starprnt" = "tsc";
+let currentLang: "tsc" | "zpl" | "epl" | "cpcl" | "dpl" | "sbpl" | "ipl" | "escpos" | "starprnt" =
+  "tsc";
 
 /** Convert etiket RasterData (8-bit per pixel rows) to portakal MonochromeBitmap (1-bit packed) */
 function rasterToBitmap(raster: RasterData): MonochromeBitmap {
@@ -247,6 +248,7 @@ function generateCodeSnippet(): string {
     cpcl: "toCPCL",
     dpl: "toDPL",
     sbpl: "toSBPL",
+    ipl: "toIPL",
     tsc: "toTSC",
   };
   const lang = langMap[currentLang] ?? "toTSC";
@@ -275,6 +277,8 @@ function generate(): void {
       output = b.toDPL();
     } else if (currentLang === "sbpl") {
       output = b.toSBPL();
+    } else if (currentLang === "ipl") {
+      output = b.toIPL();
     } else {
       output = b.toTSC();
     }
@@ -471,6 +475,8 @@ function generateReceipt(): void {
       output = b.toDPL();
     } else if (rlang === "sbpl") {
       output = b.toSBPL();
+    } else if (rlang === "ipl") {
+      output = b.toIPL();
     } else {
       output = b.toTSC();
     }
@@ -486,6 +492,7 @@ function generateReceipt(): void {
       cpcl: "toCPCL",
       dpl: "toDPL",
       sbpl: "toSBPL",
+      ipl: "toIPL",
       tsc: "toTSC",
     };
     const langMethod = rLangMap[rlang] ?? "toESCPOS";

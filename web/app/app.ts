@@ -29,7 +29,7 @@ function checked(id: string): boolean {
   return ($(id) as HTMLInputElement).checked;
 }
 
-let currentLang: "tsc" | "zpl" | "epl" | "cpcl" | "escpos" = "tsc";
+let currentLang: "tsc" | "zpl" | "epl" | "cpcl" | "dpl" | "sbpl" | "escpos" | "starprnt" = "tsc";
 
 /** Convert etiket RasterData (8-bit per pixel rows) to portakal MonochromeBitmap (1-bit packed) */
 function rasterToBitmap(raster: RasterData): MonochromeBitmap {
@@ -241,9 +241,12 @@ function generateCodeSnippet(): string {
 
   const langMap: Record<string, string> = {
     escpos: "toESCPOS",
+    starprnt: "toStarPRNT",
     zpl: "toZPL",
     epl: "toEPL",
     cpcl: "toCPCL",
+    dpl: "toDPL",
+    sbpl: "toSBPL",
     tsc: "toTSC",
   };
   const lang = langMap[currentLang] ?? "toTSC";
@@ -260,12 +263,18 @@ function generate(): void {
     let output: string;
     if (currentLang === "escpos") {
       output = formatHex(b.toESCPOS());
+    } else if (currentLang === "starprnt") {
+      output = formatHex(b.toStarPRNT());
     } else if (currentLang === "zpl") {
       output = b.toZPL();
     } else if (currentLang === "epl") {
       output = b.toEPL();
     } else if (currentLang === "cpcl") {
       output = b.toCPCL();
+    } else if (currentLang === "dpl") {
+      output = b.toDPL();
+    } else if (currentLang === "sbpl") {
+      output = b.toSBPL();
     } else {
       output = b.toTSC();
     }
@@ -450,12 +459,18 @@ function generateReceipt(): void {
     let output: string;
     if (rlang === "escpos") {
       output = formatHex(b.toESCPOS());
+    } else if (rlang === "starprnt") {
+      output = formatHex(b.toStarPRNT());
     } else if (rlang === "zpl") {
       output = b.toZPL();
     } else if (rlang === "epl") {
       output = b.toEPL();
     } else if (rlang === "cpcl") {
       output = b.toCPCL();
+    } else if (rlang === "dpl") {
+      output = b.toDPL();
+    } else if (rlang === "sbpl") {
+      output = b.toSBPL();
     } else {
       output = b.toTSC();
     }
@@ -463,14 +478,17 @@ function generateReceipt(): void {
     $("#receipt-output").textContent = output;
 
     // Code preview
-    const langMap: Record<string, string> = {
+    const rLangMap: Record<string, string> = {
       escpos: "toESCPOS",
+      starprnt: "toStarPRNT",
       zpl: "toZPL",
       epl: "toEPL",
       cpcl: "toCPCL",
+      dpl: "toDPL",
+      sbpl: "toSBPL",
       tsc: "toTSC",
     };
-    const langMethod = langMap[rlang] ?? "toESCPOS";
+    const langMethod = rLangMap[rlang] ?? "toESCPOS";
 
     const code = `import { label, formatPair, separator } from "portakal";
 

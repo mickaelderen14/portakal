@@ -255,12 +255,59 @@ builder.raw(new Uint8Array([0x1b, 0x70, 0x00, 0x32, 0x32])); // ESC/POS cash dra
 
 ### Output Methods
 
-| Method        | Output       | Target                   |
-| :------------ | :----------- | :----------------------- |
-| `.toTSC()`    | `string`     | TSC/TSPL2 label printers |
-| `.toZPL()`    | `string`     | Zebra ZPL II printers    |
-| `.toEPL()`    | `string`     | Eltron EPL2 printers     |
-| `.toESCPOS()` | `Uint8Array` | ESC/POS receipt printers |
+| Method          | Output       | Target                          |
+| :-------------- | :----------- | :------------------------------ |
+| `.toTSC()`      | `string`     | TSC/TSPL2 label printers        |
+| `.toZPL()`      | `string`     | Zebra ZPL II printers           |
+| `.toEPL()`      | `string`     | Eltron EPL2 printers            |
+| `.toCPCL()`     | `string`     | Zebra mobile printers           |
+| `.toDPL()`      | `string`     | Honeywell/Datamax printers      |
+| `.toSBPL()`     | `string`     | SATO printers                   |
+| `.toESCPOS()`   | `Uint8Array` | ESC/POS receipt printers        |
+| `.toStarPRNT()` | `Uint8Array` | Star Micronics printers         |
+| `.toPreview()`  | `string`     | SVG preview (no printer needed) |
+
+### Image Processing
+
+Convert any RGBA image to monochrome bitmap with dithering:
+
+```ts
+import { imageToMonochrome } from "portakal";
+
+const bitmap = imageToMonochrome(rgbaPixels, width, height, {
+  dither: "floyd-steinberg", // "threshold" | "floyd-steinberg" | "atkinson" | "ordered"
+});
+
+label({ width: 40, height: 30 }).image(bitmap, { x: 10, y: 10 }).toTSC();
+```
+
+### Receipt Layout
+
+```ts
+import { formatPair, separator, formatTable } from "portakal";
+
+// Same-line left+right alignment
+formatPair("Hamburger x2", "$25.98", 48);
+// → "Hamburger x2                              $25.98"
+
+// Separator line
+separator("=", 48);
+// → "================================================"
+
+// Multi-column table
+formatTable(
+  [
+    { width: 30, align: "left" },
+    { width: 5, align: "center" },
+    { width: 13, align: "right" },
+  ],
+  [
+    ["Item", "Qty", "Price"],
+    ["Hamburger", "2", "$25.98"],
+  ],
+  48,
+);
+```
 
 ## Supported Printer Languages
 
@@ -269,13 +316,14 @@ builder.raw(new Uint8Array([0x1b, 0x70, 0x00, 0x32, 0x32])); // ESC/POS cash dra
 | **TSC/TSPL2**   | TSC, Gprinter, Xprinter, iDPRT, Munbyn, Polono | :white_check_mark: |
 | **ZPL II**      | Zebra GK420, ZT410, ZD620, ZQ series           | :white_check_mark: |
 | **EPL2**        | Zebra LP/TLP 2824, GX420, ZD220, ZD420         | :white_check_mark: |
+| **CPCL**        | Zebra QLn, ZQ mobile printers                  | :white_check_mark: |
+| **DPL**         | Honeywell/Datamax label printers               | :white_check_mark: |
+| **SBPL**        | SATO label printers                            | :white_check_mark: |
 | **ESC/POS**     | Epson, Bixolon, Citizen, Star (compat mode)    | :white_check_mark: |
-| **CPCL**        | Zebra QLn, ZQ mobile printers                  | Planned            |
-| **DPL**         | Honeywell/Datamax label printers               | Planned            |
+| **Star PRNT**   | Star TSP100/143/600/700 (native mode)          | :white_check_mark: |
 | **IPL**         | Intermec/Honeywell printers                    | Planned            |
-| **SBPL**        | SATO label printers                            | Planned            |
-| **Star PRNT**   | Star TSP100/143/600/700 (native mode)          | Planned            |
 | **Fingerprint** | Honeywell Smart Printers                       | Planned            |
+| **PPLA/PPLB**   | Argox label printers                           | Planned            |
 
 ## Transport
 
@@ -304,50 +352,52 @@ await usbDevice.transferOut(endpointNumber, escpos);
 
 ## Comparison
 
-| Feature                      |                portakal                | [node-thermal-printer](https://github.com/Klemen1337/node-thermal-printer) | [escpos](https://github.com/node-escpos/driver) | [jszpl](https://github.com/DanieLeeuwner/JSZPL) |
-| :--------------------------- | :------------------------------------: | :------------------------------------------------------------------------: | :---------------------------------------------: | :---------------------------------------------: |
-| Zero dependencies            |           :white_check_mark:           |                          :x: (pngjs, iconv-lite)                           |             :x: (get-pixels, jimp)              |               :white_check_mark:                |
-| TypeScript-first             |           :white_check_mark:           |                                  Partial                                   |                     Partial                     |               :white_check_mark:                |
-| Multi-language output        | :white_check_mark: TSC+ZPL+EPL+ESC/POS |                              :x: ESC/POS only                              |                :x: ESC/POS only                 |                  :x: ZPL only                   |
-| Transport-agnostic           |           :white_check_mark:           |                               :x: (coupled)                                |                  :x: (coupled)                  |               :white_check_mark:                |
-| Label printers (TSC/ZPL/EPL) |           :white_check_mark:           |                                    :x:                                     |                       :x:                       |                    ZPL only                     |
-| Receipt printers (ESC/POS)   |           :white_check_mark:           |                             :white_check_mark:                             |               :white_check_mark:                |                       :x:                       |
-| Image support                |           :white_check_mark:           |                             :white_check_mark:                             |               :white_check_mark:                |               :white_check_mark:                |
-| Barcode (printer-native)     |           :white_check_mark:           |                             :white_check_mark:                             |               :white_check_mark:                |               :white_check_mark:                |
-| QR Code (printer-native)     |           :white_check_mark:           |                             :white_check_mark:                             |               :white_check_mark:                |               :white_check_mark:                |
-| Works in browser             |           :white_check_mark:           |                                    :x:                                     |                       :x:                       |               :white_check_mark:                |
-| No native modules (no gyp)   |           :white_check_mark:           |                                    :x:                                     |                       :x:                       |               :white_check_mark:                |
-| Pure ESM                     |           :white_check_mark:           |                                 :x: (CJS)                                  |                    :x: (CJS)                    |                    :x: (CJS)                    |
+| Feature                      |            portakal            | [node-thermal-printer](https://github.com/Klemen1337/node-thermal-printer) | [escpos](https://github.com/node-escpos/driver) | [jszpl](https://github.com/DanieLeeuwner/JSZPL) |
+| :--------------------------- | :----------------------------: | :------------------------------------------------------------------------: | :---------------------------------------------: | :---------------------------------------------: |
+| Zero dependencies            |       :white_check_mark:       |                          :x: (pngjs, iconv-lite)                           |             :x: (get-pixels, jimp)              |               :white_check_mark:                |
+| TypeScript-first             |       :white_check_mark:       |                                  Partial                                   |                     Partial                     |               :white_check_mark:                |
+| Multi-language output        | :white_check_mark: 8 languages |                              :x: ESC/POS only                              |                :x: ESC/POS only                 |                  :x: ZPL only                   |
+| Transport-agnostic           |       :white_check_mark:       |                               :x: (coupled)                                |                  :x: (coupled)                  |               :white_check_mark:                |
+| Label printers (TSC/ZPL/EPL) |       :white_check_mark:       |                                    :x:                                     |                       :x:                       |                    ZPL only                     |
+| Receipt printers (ESC/POS)   |       :white_check_mark:       |                             :white_check_mark:                             |               :white_check_mark:                |                       :x:                       |
+| Image support                |       :white_check_mark:       |                             :white_check_mark:                             |               :white_check_mark:                |               :white_check_mark:                |
+| Barcode/QR (via etiket)      |       :white_check_mark:       |                             :white_check_mark:                             |               :white_check_mark:                |               :white_check_mark:                |
+| Image dithering              |       :white_check_mark:       |                                    :x:                                     |                       :x:                       |                       :x:                       |
+| Receipt layout engine        |       :white_check_mark:       |                                  Partial                                   |                       :x:                       |                       :x:                       |
+| SVG preview                  |       :white_check_mark:       |                                    :x:                                     |                       :x:                       |                       :x:                       |
+| Works in browser             |       :white_check_mark:       |                                    :x:                                     |                       :x:                       |               :white_check_mark:                |
+| No native modules (no gyp)   |       :white_check_mark:       |                                    :x:                                     |                       :x:                       |               :white_check_mark:                |
+| Pure ESM                     |       :white_check_mark:       |                                 :x: (CJS)                                  |                    :x: (CJS)                    |                    :x: (CJS)                    |
 
-**portakal is the only library that generates** TSC + ZPL + EPL + ESC/POS from a single API with zero dependencies.
+**portakal is the only library that generates** 8 printer languages from a single API with zero dependencies.
 
 ## Features
 
-- Zero dependencies
+- Zero dependencies — pure computation, no native modules, no node-gyp
+- **8 printer languages** — TSC, ZPL, EPL, CPCL, DPL, SBPL, ESC/POS, Star PRNT
 - Pure ESM, edge-runtime compatible (Cloudflare Workers, Deno, Bun)
 - TypeScript-first with strict types (tsgo)
 - Transport-agnostic — generates commands, you handle the connection
-- Multi-language — one label definition compiles to TSC, ZPL, EPL, or ESC/POS
-- Fluent builder API
-- Works in browser, Node.js, Deno, Bun, Electron
-- No native modules — no node-gyp, no libusb, no compilation
-- Barcode + QR code via printer-native commands (20+ symbologies)
-- Image support via MonochromeBitmap
+- Fluent builder API — one label definition compiles to any language
+- **Image processing** — RGBA → monochrome with 4 dithering algorithms (Floyd-Steinberg, Atkinson, ordered, threshold)
+- **Receipt layout engine** — same-line left+right alignment, tables, word-wrap, separators
+- **SVG preview** — `.toPreview()` renders labels without a physical printer
 - Drawing primitives — box, line, circle, diagonal
 - Raw command passthrough for advanced/unsupported features
-- Optional [`etiket`](https://github.com/productdevbook/etiket) integration for pixel-perfect barcode/QR images
+- Optional [`etiket`](https://github.com/productdevbook/etiket) integration for barcode/QR images (40+ formats)
+- Works in browser, Node.js, Deno, Bun, Electron
+- 153 tests across 13 test files
 
 ## Contributing
 
 Contributions are welcome! Here are areas where help is especially appreciated:
 
-- **CPCL, DPL, IPL, SBPL, Star PRNT** compiler implementations
-- Image processing pipeline (dithering, compression)
-- Character encoding engine (UTF-8 auto code page selection)
+- **IPL, Fingerprint, Argox PPLA/PPLB** compiler implementations
+- UTF-8 encoding engine (auto code page selection)
 - Arabic/Hebrew RTL support (bidi + shaping)
-- Receipt layout engine (tables, same-line alignment)
-- Printer capability profiles
+- Printer capability profiles (auto-detect features per model)
 - Transport layer implementations (WebUSB, WebSerial, Web Bluetooth)
+- Star TSP100 raster-only mode
 
 ```bash
 pnpm install    # Install dependencies

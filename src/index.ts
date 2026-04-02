@@ -32,6 +32,16 @@ export {
   findByLanguage,
 } from "./profiles";
 export type { PrinterProfile, PrinterLanguage, CutterType, ImageMode } from "./profiles";
+export { chunkedWrite, writeWithRetry, BLE_UUIDS, USB_VENDOR_IDS } from "./transport";
+export type {
+  PrinterTransport,
+  ConnectionState,
+  ChunkOptions,
+  ReconnectOptions,
+  TCPConfig,
+  USBConfig,
+  BLEConfig,
+} from "./transport";
 
 export type {
   Alignment,

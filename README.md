@@ -96,6 +96,28 @@ myLabel.toEPL(); // Eltron EPL2 — LP/TLP 2824, GX420, ZD220
 myLabel.toESCPOS(); // ESC/POS — Epson, Bixolon, Star, Citizen
 ```
 
+### Tree Shaking
+
+Import only what you need — each module is a separate entry point:
+
+```ts
+import { compileToTSC } from "portakal/tsc";
+import { compileToZPL } from "portakal/zpl";
+import { compileToEPL } from "portakal/epl";
+import { compileToESCPOS } from "portakal/escpos";
+import { compileToCPCL } from "portakal/cpcl";
+import { compileToDPL } from "portakal/dpl";
+import { compileToSBPL } from "portakal/sbpl";
+import { compileToStarPRNT } from "portakal/starprnt";
+import { compileToIPL } from "portakal/ipl";
+import { imageToMonochrome } from "portakal/image";
+import { formatPair, separator } from "portakal/receipt";
+import { encodeTextForPrinter } from "portakal/encoding";
+import { getProfile } from "portakal/profiles";
+import { chunkedWrite } from "portakal/transport";
+import { renderPreview } from "portakal/preview";
+```
+
 ### Software-rendered barcode/QR (with etiket)
 
 For pixel-perfect output, styled QR codes, or when the printer doesn't support a format natively:
@@ -378,6 +400,7 @@ await usbDevice.transferOut(endpointNumber, escpos);
 
 - Zero dependencies — pure computation, no native modules, no node-gyp
 - **9 printer languages** — TSC, ZPL, EPL, CPCL, DPL, SBPL, ESC/POS, Star PRNT, IPL
+- **Tree-shakeable** — sub-path exports for every module (`portakal/tsc`, `portakal/image`, etc.)
 - Pure ESM, edge-runtime compatible (Cloudflare Workers, Deno, Bun)
 - TypeScript-first with strict types (tsgo)
 - Transport-agnostic — generates commands, you handle the connection

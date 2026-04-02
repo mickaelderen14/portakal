@@ -4,6 +4,7 @@ import {
   separator,
   renderPreview,
   parseTSC,
+  parseTSPL,
   parseZPL,
   parseEPL,
   parseCPCL,
@@ -461,6 +462,141 @@ export function setupApp(): void {
     } catch {
       // ignore parse errors while typing
     }
+  });
+
+  // Validate tab
+  function runValidate(): void {
+    const code = ($("#v-code") as HTMLTextAreaElement).value;
+    const lang = val("#v-lang");
+    if (!code.trim()) {
+      $("#v-preview").innerHTML = "";
+      $("#v-result").textContent = "";
+      $("#v-warnings").textContent = "";
+      return;
+    }
+
+    try {
+      let commands: any[] = [];
+      let elements: any[] = [];
+      let warnings: string[] = [];
+      let widthDots = 320;
+      let heightDots = 240;
+
+      if (lang === "tsc") {
+        const r = parseTSPL(code);
+        commands = r.commands;
+        elements = r.elements;
+        warnings = r.warnings;
+        widthDots = r.widthDots;
+        heightDots = r.heightDots;
+      } else if (lang === "zpl") {
+        const r = parseZPL(code);
+        commands = r.commands;
+        elements = r.elements;
+        warnings = r.warnings;
+        widthDots = r.widthDots;
+        heightDots = r.heightDots;
+      } else if (lang === "epl") {
+        const r = parseEPL(code);
+        commands = r.commands;
+        elements = r.elements;
+        warnings = r.warnings;
+        widthDots = r.widthDots;
+        heightDots = r.heightDots || 240;
+      } else if (lang === "cpcl") {
+        const r = parseCPCL(code);
+        commands = r.commands;
+        elements = r.elements;
+        warnings = r.warnings;
+        widthDots = r.widthDots;
+        heightDots = r.heightDots;
+      } else if (lang === "dpl") {
+        const r = parseDPL(code);
+        commands = r.commands;
+        elements = r.elements;
+        warnings = r.warnings;
+        widthDots = r.widthDots;
+      } else if (lang === "sbpl") {
+        const r = parseSBPL(code);
+        commands = r.commands;
+        elements = r.elements;
+        warnings = r.warnings;
+      } else if (lang === "ipl") {
+        const r = parseIPL(code);
+        commands = r.commands;
+        elements = r.elements;
+        warnings = r.warnings;
+        widthDots = r.widthDots;
+        heightDots = r.heightDots;
+      }
+
+      // Count stats
+      const unknowns = commands.filter(
+        (c: any) => c.cmd === "UNKNOWN" || c.type === "UNKNOWN",
+      ).length;
+      const total = commands.length;
+
+      // Build result summary
+      let result = `Language: ${lang.toUpperCase()}\n`;
+      result += `Commands: ${total}\n`;
+      result += `Elements: ${elements.length}\n`;
+      result += `Label: ${widthDots}×${heightDots} dots\n`;
+      if (unknowns > 0) {
+        result += `Unknown: ${unknowns} (${Math.round((unknowns / total) * 100)}%)\n`;
+      }
+      result += `\n--- Commands ---\n`;
+      for (const cmd of commands) {
+        const name = cmd.cmd ?? cmd.code ?? cmd.type ?? cmd.name ?? "?";
+        result += `${name}`;
+        if (cmd.content) result += ` "${cmd.content}"`;
+        if (cmd.rawParams) result += ` ${cmd.rawParams}`;
+        if (cmd.params && typeof cmd.params === "string") result += ` ${cmd.params}`;
+        if (cmd.raw) result += ` (raw: ${cmd.raw.slice(0, 50)})`;
+        result += "\n";
+      }
+
+      $("#v-result").textContent = result;
+
+      // Warnings
+      let warnText = "";
+      if (unknowns > 0) {
+        warnText += `${unknowns} unknown/unrecognized command(s)\n`;
+      }
+      for (const w of warnings) {
+        warnText += `${w}\n`;
+      }
+      if (!warnText) warnText = "No warnings — all commands recognized.";
+      $("#v-warnings").textContent = warnText;
+
+      // Preview
+      const resolved: ResolvedLabel = {
+        widthDots,
+        heightDots,
+        dpi: 203,
+        gapDots: 24,
+        speed: 4,
+        density: 8,
+        direction: 0,
+        copies: 1,
+        elements,
+      };
+      $("#v-preview").innerHTML = renderPreview(resolved);
+    } catch (e: any) {
+      $("#v-result").textContent = `Parse error: ${e.message}`;
+      $("#v-warnings").textContent = "";
+      $("#v-preview").innerHTML = "";
+    }
+  }
+
+  $("#v-code").addEventListener("input", runValidate);
+  $("#v-lang").addEventListener("change", runValidate);
+
+  $("#btn-copy-validate").addEventListener("click", () => {
+    const text = $("#v-result").textContent ?? "";
+    navigator.clipboard.writeText(text);
+    const btn = $("#btn-copy-validate");
+    btn.textContent = "Copied!";
+    setTimeout(() => (btn.textContent = "Copy"), 1500);
   });
 
   generate();

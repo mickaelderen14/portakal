@@ -27,6 +27,7 @@
       <nav class="tabs" role="tablist">
         <button class="tab active" data-tab="label" role="tab">Label</button>
         <button class="tab" data-tab="receipt" role="tab">Receipt</button>
+        <button class="tab" data-tab="validate" role="tab">Validate</button>
       </nav>
 
       <section class="panel active" data-panel="label">
@@ -503,6 +504,92 @@ Coffee,2,7.00</textarea
                 id="receipt-code"
                 class="output-code"
                 style="min-height: 80px; max-height: 200px; color: #a78bfa"
+              ></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- ═══════ VALIDATE ═══════ -->
+      <section class="panel" data-panel="validate">
+        <div class="split">
+          <div class="controls" style="min-width: 100%">
+            <div class="ctrl-section">
+              <div class="ctrl-header">
+                <h3>Paste Printer Commands</h3>
+              </div>
+              <div class="ctrl-body" style="display: block">
+                <div class="field full">
+                  <label for="v-lang">Language</label>
+                  <select id="v-lang">
+                    <option value="tsc" selected>TSC/TSPL2</option>
+                    <option value="zpl">ZPL II</option>
+                    <option value="epl">EPL2</option>
+                    <option value="cpcl">CPCL</option>
+                    <option value="dpl">DPL</option>
+                    <option value="sbpl">SBPL</option>
+                    <option value="ipl">IPL</option>
+                  </select>
+                </div>
+                <div class="field full">
+                  <label for="v-code">Commands</label>
+                  <textarea
+                    id="v-code"
+                    rows="12"
+                    spellcheck="false"
+                    placeholder="Paste your TSC, ZPL, EPL, CPCL, DPL, SBPL, or IPL commands here..."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem">
+          <div class="output">
+            <div class="preview-section">
+              <div class="preview-header"><h3>Preview</h3></div>
+              <div id="v-preview" class="preview-canvas" style="min-height: 150px"></div>
+            </div>
+          </div>
+          <div class="output">
+            <div class="code-section">
+              <div class="output-header">
+                <h3
+                  style="
+                    font-size: 0.65rem;
+                    color: var(--text-dim);
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                    font-weight: 700;
+                  "
+                >
+                  Parse Result
+                </h3>
+                <button id="btn-copy-validate" class="btn">Copy</button>
+              </div>
+              <pre
+                id="v-result"
+                class="output-code"
+                style="min-height: 200px; max-height: 400px"
+              ></pre>
+            </div>
+            <div class="code-section">
+              <div class="output-header">
+                <h3
+                  style="
+                    font-size: 0.65rem;
+                    color: var(--text-dim);
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                    font-weight: 700;
+                  "
+                >
+                  Warnings
+                </h3>
+              </div>
+              <pre
+                id="v-warnings"
+                class="output-code"
+                style="min-height: 40px; max-height: 120px; color: #fbbf24"
               ></pre>
             </div>
           </div>

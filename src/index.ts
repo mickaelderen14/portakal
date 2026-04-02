@@ -5,7 +5,19 @@ export { compileToTSC } from "./languages/tsc";
 export { compileToZPL } from "./languages/zpl";
 export { compileToEPL } from "./languages/epl";
 export { compileToESCPOS } from "./languages/escpos";
+export { compileToCPCL } from "./languages/cpcl";
 export { renderPreview } from "./preview";
+export {
+  imageToMonochrome,
+  rgbaToGrayscale,
+  packBitmap,
+  ditherThreshold,
+  ditherFloydSteinberg,
+  ditherAtkinson,
+  ditherOrdered,
+} from "./image";
+export { formatRow, formatPair, formatTable, separator, wordWrap } from "./receipt";
+export type { Column } from "./receipt";
 
 export type {
   Alignment,

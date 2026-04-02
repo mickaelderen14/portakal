@@ -4,7 +4,7 @@
   <br><br>
   <b style="font-size: 2em;">portakal</b>
   <br><br>
-  Universal printer language SDK — TSC, ZPL, EPL, ESC/POS and more.
+  Universal printer language SDK — 9 languages, one API.
   <br>
   Text, barcodes, QR codes, images, shapes — anything you can print.
   <br>
@@ -14,6 +14,8 @@
   <a href="https://npmjs.com/package/portakal"><img src="https://img.shields.io/npm/dm/portakal?style=flat&colorA=18181B&colorB=F97316" alt="npm downloads"></a>
   <a href="https://bundlephobia.com/result?p=portakal"><img src="https://img.shields.io/bundlephobia/minzip/portakal?style=flat&colorA=18181B&colorB=F97316" alt="bundle size"></a>
   <a href="https://github.com/productdevbook/portakal/blob/main/LICENSE"><img src="https://img.shields.io/github/license/productdevbook/portakal?style=flat&colorA=18181B&colorB=F97316" alt="license"></a>
+  <br><br>
+  <a href="https://portakal.productdevbook.com">Playground</a> · <a href="https://github.com/productdevbook/portakal">GitHub</a> · <a href="https://npmjs.com/package/portakal">npm</a>
 </p>
 
 > [!NOTE]

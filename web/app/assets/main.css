@@ -383,3 +383,41 @@ input[type="checkbox"] {
   color: var(--text-muted);
   cursor: pointer;
 }
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.footer-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: var(--transition);
+}
+
+.footer-links a:hover {
+  color: var(--accent);
+}
+
+.footer-sep {
+  color: var(--border);
+  font-size: 0.8rem;
+}
+
+.footer-desc {
+  color: var(--text-dim);
+  font-size: 0.7rem;
+  opacity: 0.6;
+}

@@ -334,6 +334,60 @@ formatTable(
 );
 ```
 
+### Cross-Compiler
+
+Convert between any printer languages — world's first thermal printer translator:
+
+```ts
+import { convert } from "portakal";
+
+// TSC → ZPL
+const { output } = convert(tscCode, "tsc", "zpl");
+
+// ZPL → ESC/POS
+const { output } = convert(zplCode, "zpl", "escpos");
+
+// EPL → CPCL
+const { output } = convert(eplCode, "epl", "cpcl");
+```
+
+7 source × 9 target = **63 conversion paths**.
+
+### Validation
+
+Check printer commands for errors before sending to printer:
+
+```ts
+import { validate } from "portakal";
+
+const result = validate(code, "tsc");
+// { valid: false, errors: 1, warnings: 2, issues: [
+//   { level: "error", message: "CLS must appear before label elements" },
+//   { level: "warning", message: "No PRINT command found" },
+// ]}
+```
+
+TSC validation: SIZE order, CLS before elements, PRINT required, DENSITY 0-15, SPEED 1-18.
+ZPL validation: ^XA/^XZ required, ^FD without ^FO, ^PW range.
+
+### Printer Profiles
+
+Auto-configure DPI, paper width, and capabilities based on printer model:
+
+```ts
+import { label, getProfile, findByVendorId } from "portakal";
+
+// Auto-DPI from profile
+label({ width: 40, height: 30, printer: "tsc-te310" }); // 300 DPI
+label({ width: 80, printer: "epson-tm-t88vi" }); // 203 DPI
+
+// Lookup profiles
+getProfile("zebra-zd420"); // { name, dpi, paperWidth, ... }
+findByVendorId(0x04b8); // All Epson printers
+```
+
+20 built-in profiles: Epson, Star, Bixolon, Citizen, TSC, Zebra, SATO, Honeywell, Generic.
+
 ## Supported Printer Languages
 
 | Language        | Printers                                       | Status             |
@@ -391,6 +445,9 @@ await usbDevice.transferOut(endpointNumber, escpos);
 | Receipt layout engine        |       :white_check_mark:       |                                  Partial                                   |                       :x:                       |                       :x:                       |
 | SVG preview                  |       :white_check_mark:       |                                    :x:                                     |                       :x:                       |                       :x:                       |
 | Command parser (reverse)     |  :white_check_mark: 9 parsers  |                                    :x:                                     |                       :x:                       |                       :x:                       |
+| Cross-compiler (translate)   |  :white_check_mark: 63 paths   |                                    :x:                                     |                       :x:                       |                       :x:                       |
+| Command validation           |       :white_check_mark:       |                                    :x:                                     |                       :x:                       |                       :x:                       |
+| Printer profiles             |     :white_check_mark: 20      |                                    :x:                                     |                       :x:                       |                       :x:                       |
 | Works in browser             |       :white_check_mark:       |                                    :x:                                     |                       :x:                       |               :white_check_mark:                |
 | No native modules (no gyp)   |       :white_check_mark:       |                                    :x:                                     |                       :x:                       |               :white_check_mark:                |
 | Pure ESM                     |       :white_check_mark:       |                                 :x: (CJS)                                  |                    :x: (CJS)                    |                    :x: (CJS)                    |
@@ -415,18 +472,23 @@ await usbDevice.transferOut(endpointNumber, escpos);
 - Optional [`etiket`](https://github.com/productdevbook/etiket) integration for barcode/QR images (40+ formats)
 - Works in browser, Node.js, Deno, Bun, Electron
 - **UTF-8 encoding engine** — auto code page selection (CP437, CP858, CP1252, CP866, CP857)
-- 389 tests across 23 test files
+- **Cross-compiler** — convert between any languages (63 paths: TSC↔ZPL↔EPL↔CPCL↔DPL↔SBPL↔IPL↔ESC/POS↔Star)
+- **Real validation** — parameter ranges, command order, structure checks
+- **20 printer profiles** — auto-DPI, auto-width by model (Epson, Star, Zebra, TSC, SATO, etc.)
+- 416 tests across 26 test files
 
 ## Contributing
 
 Contributions are welcome! Here are areas where help is especially appreciated:
 
-- **IPL, Fingerprint, Argox PPLA/PPLB** compiler implementations
-- UTF-8 encoding engine (auto code page selection)
-- Arabic/Hebrew RTL support (bidi + shaping)
-- Printer capability profiles (auto-detect features per model)
-- Transport layer implementations (WebUSB, WebSerial, Web Bluetooth)
-- Star TSP100 raster-only mode
+- **Arabic/Hebrew RTL** support (bidi algorithm + Arabic shaping)
+- **GS1/UDI label standards** (SSCC, GTIN, FMD, DSCSA templates)
+- **Star TSP100** raster-only text rendering
+- **CJK encoding** (GB18030, Shift_JIS, Big5, EUC-KR)
+- **Fingerprint** (Honeywell BASIC-like) compiler
+- **WebUSB/WebSerial/Web Bluetooth** transport adapters
+- Additional printer profiles
+- Parser validation rules for more languages
 
 ```bash
 pnpm install    # Install dependencies

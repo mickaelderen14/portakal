@@ -96,26 +96,51 @@ myLabel.toEPL(); // Eltron EPL2 — LP/TLP 2824, GX420, ZD220
 myLabel.toESCPOS(); // ESC/POS — Epson, Bixolon, Star, Citizen
 ```
 
-### Tree Shaking
+### Language Modules (tree-shakeable)
 
-Import only what you need — each module is a separate entry point:
+Each language is a standalone module with compile, parse, preview, and validate:
+
+```ts
+import { label } from "portakal/core";
+import { tsc } from "portakal/lang/tsc";
+import { zpl } from "portakal/lang/zpl";
+import { escpos } from "portakal/lang/escpos";
+
+const myLabel = label({ width: 40, height: 30 })
+  .text("Hello", { x: 10, y: 10, size: 2 })
+  .box({ x: 5, y: 5, width: 310, height: 230, thickness: 2 });
+
+// Compile — only imported language enters your bundle
+tsc.compile(myLabel); // TSC/TSPL2 commands (string)
+zpl.compile(myLabel); // ZPL II commands (string)
+escpos.compile(myLabel); // ESC/POS bytes (Uint8Array)
+
+// Preview — each language uses its own font metrics
+tsc.preview(myLabel); // SVG with TSC fonts (8x12 to 32x48)
+zpl.preview(myLabel); // SVG with ZPL fonts (A:5x9 to V:71x80)
+escpos.preview(myLabel); // Receipt-style SVG (line-by-line)
+
+// Parse — reverse
+tsc.parse(tscCode); // { commands, elements, widthDots, ... }
+zpl.parse(zplCode); // { commands, elements, warnings, ... }
+
+// Validate
+tsc.validate(tscCode); // { valid, errors, issues }
+zpl.validate(zplCode); // { valid, errors, issues }
+```
+
+Available modules: `tsc`, `zpl`, `epl`, `cpcl`, `dpl`, `sbpl`, `escpos`, `starprnt`, `ipl`
+
+### Tree Shaking (low-level)
+
+Individual functions are also available as separate entry points:
 
 ```ts
 import { compileToTSC } from "portakal/tsc";
-import { compileToZPL } from "portakal/zpl";
-import { compileToEPL } from "portakal/epl";
-import { compileToESCPOS } from "portakal/escpos";
-import { compileToCPCL } from "portakal/cpcl";
-import { compileToDPL } from "portakal/dpl";
-import { compileToSBPL } from "portakal/sbpl";
-import { compileToStarPRNT } from "portakal/starprnt";
-import { compileToIPL } from "portakal/ipl";
 import { imageToMonochrome } from "portakal/image";
-import { formatPair, separator } from "portakal/receipt";
-import { encodeTextForPrinter } from "portakal/encoding";
-import { getProfile } from "portakal/profiles";
-import { chunkedWrite } from "portakal/transport";
-import { renderPreview } from "portakal/preview";
+import { formatPair } from "portakal/receipt";
+import { convert } from "portakal";
+import { markup } from "portakal";
 ```
 
 ### Software-rendered barcode/QR (with etiket)
@@ -475,7 +500,9 @@ await usbDevice.transferOut(endpointNumber, escpos);
 - **Cross-compiler** — convert between any languages (63 paths: TSC↔ZPL↔EPL↔CPCL↔DPL↔SBPL↔IPL↔ESC/POS↔Star)
 - **Real validation** — parameter ranges, command order, structure checks
 - **20 printer profiles** — auto-DPI, auto-width by model (Epson, Star, Zebra, TSC, SATO, etc.)
-- 416 tests across 26 test files
+- **Language modules** — each language is a standalone module (compile + parse + preview + validate)
+- **Per-language SVG preview** — TSC fonts differ from ZPL fonts, ESC/POS renders receipt-style
+- 447 tests across 28 test files
 
 ## Contributing
 

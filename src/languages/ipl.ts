@@ -63,6 +63,11 @@ function compileElement(el: LabelElement, fieldNum: number): string[] {
     case "circle":
       break;
 
+    case "ellipse":
+    case "reverse":
+    case "erase":
+      break;
+
     case "raw":
       if (typeof el.content === "string") cmds.push(el.content);
       break;

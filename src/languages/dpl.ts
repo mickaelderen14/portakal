@@ -76,6 +76,10 @@ function compileElement(el: LabelElement): string {
     case "circle":
       return "";
 
+    case "ellipse":
+    case "reverse":
+    case "erase":
+      return "";
     case "raw":
       return typeof el.content === "string" ? el.content : "";
   }

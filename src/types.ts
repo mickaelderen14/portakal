@@ -132,6 +132,31 @@ export interface MonochromeBitmap {
   bytesPerRow: number;
 }
 
+/** Ellipse element options */
+export interface EllipseOptions {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  thickness?: number;
+}
+
+/** Reverse region options (invert black/white) */
+export interface ReverseOptions {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/** Erase region options (clear to white) */
+export interface EraseOptions {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 /** Internal label element union type */
 export type LabelElement =
   | { type: "text"; content: string; options: TextOptions }
@@ -139,6 +164,9 @@ export type LabelElement =
   | { type: "box"; options: BoxOptions }
   | { type: "line"; options: LineOptions }
   | { type: "circle"; options: CircleOptions }
+  | { type: "ellipse"; options: EllipseOptions }
+  | { type: "reverse"; options: ReverseOptions }
+  | { type: "erase"; options: EraseOptions }
   | { type: "raw"; content: string | Uint8Array };
 
 /** Resolved label configuration with computed values */

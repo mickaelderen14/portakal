@@ -86,6 +86,10 @@ function compileElement(el: LabelElement): string {
       return `^FO${o.x},${o.y}^GC${o.diameter},${t},B^FS`;
     }
 
+    case "ellipse":
+    case "reverse":
+    case "erase":
+      return "";
     case "raw":
       return typeof el.content === "string" ? el.content : "";
   }

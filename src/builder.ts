@@ -1,12 +1,15 @@
 import type {
   BoxOptions,
   CircleOptions,
+  EllipseOptions,
+  EraseOptions,
   ImageOptions,
   LabelConfig,
   LabelElement,
   LineOptions,
   MonochromeBitmap,
   ResolvedLabel,
+  ReverseOptions,
   TextOptions,
 } from "./types";
 import { InvalidConfigError } from "./errors";
@@ -55,6 +58,21 @@ export class LabelBuilder {
 
   circle(options: CircleOptions): this {
     this.elements.push({ type: "circle", options });
+    return this;
+  }
+
+  ellipse(options: EllipseOptions): this {
+    this.elements.push({ type: "ellipse", options });
+    return this;
+  }
+
+  reverse(options: ReverseOptions): this {
+    this.elements.push({ type: "reverse", options });
+    return this;
+  }
+
+  erase(options: EraseOptions): this {
+    this.elements.push({ type: "erase", options });
     return this;
   }
 

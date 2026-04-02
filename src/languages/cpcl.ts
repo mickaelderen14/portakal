@@ -47,6 +47,10 @@ function compileElement(el: LabelElement): string {
       // CPCL doesn't support circles natively
       return "";
 
+    case "ellipse":
+    case "reverse":
+    case "erase":
+      return "";
     case "raw":
       return typeof el.content === "string" ? el.content : "";
   }

@@ -77,6 +77,11 @@ function compileElement(el: LabelElement): string[] {
     case "circle":
       break;
 
+    case "ellipse":
+    case "reverse":
+    case "erase":
+      break;
+
     case "raw":
       if (typeof el.content === "string") cmds.push(el.content);
       break;

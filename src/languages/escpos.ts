@@ -92,6 +92,9 @@ function compileElement(el: LabelElement, buf: ByteBuffer): void {
       break;
     }
 
+    case "ellipse":
+    case "reverse":
+    case "erase":
     case "box":
     case "line":
     case "circle":

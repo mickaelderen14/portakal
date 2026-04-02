@@ -82,6 +82,24 @@ function renderElement(el: LabelElement): string {
       return `<circle cx="${o.x + r}" cy="${o.y + r}" r="${r}" fill="none" stroke="#000" stroke-width="${t}"/>`;
     }
 
+    case "ellipse": {
+      const o = el.options;
+      const t = o.thickness ?? 1;
+      const rx = o.width / 2;
+      const ry = o.height / 2;
+      return `<ellipse cx="${o.x + rx}" cy="${o.y + ry}" rx="${rx}" ry="${ry}" fill="none" stroke="#000" stroke-width="${t}"/>`;
+    }
+
+    case "reverse": {
+      const o = el.options;
+      return `<rect x="${o.x}" y="${o.y}" width="${o.width}" height="${o.height}" fill="#000"/>`;
+    }
+
+    case "erase": {
+      const o = el.options;
+      return `<rect x="${o.x}" y="${o.y}" width="${o.width}" height="${o.height}" fill="#fff"/>`;
+    }
+
     case "raw":
       return "";
   }

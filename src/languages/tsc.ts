@@ -58,6 +58,22 @@ function compileElement(el: LabelElement): string {
       return `CIRCLE ${o.x},${o.y},${o.diameter},${t}`;
     }
 
+    case "ellipse": {
+      const o = el.options;
+      const t = o.thickness ?? 1;
+      return `ELLIPSE ${o.x},${o.y},${o.width},${o.height},${t}`;
+    }
+
+    case "reverse": {
+      const o = el.options;
+      return `REVERSE ${o.x},${o.y},${o.width},${o.height}`;
+    }
+
+    case "erase": {
+      const o = el.options;
+      return `ERASE ${o.x},${o.y},${o.width},${o.height}`;
+    }
+
     case "raw":
       return typeof el.content === "string" ? el.content : "";
   }

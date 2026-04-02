@@ -35,6 +35,8 @@ export type { PrinterProfile, PrinterLanguage, CutterType, ImageMode } from "./p
 export { chunkedWrite, writeWithRetry, BLE_UUIDS, USB_VENDOR_IDS } from "./transport";
 export { parseTSC, parseTSPL } from "./parsers/tsc";
 export { parseZPL } from "./parsers/zpl";
+export { parseEPL } from "./parsers/epl";
+export { parseCPCL } from "./parsers/cpcl";
 export type {
   PrinterTransport,
   ConnectionState,

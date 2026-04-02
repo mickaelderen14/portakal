@@ -341,7 +341,8 @@ textarea.output-editable:focus {
 }
 
 .lang-tab,
-.rlang-tab {
+.rlang-tab,
+.mlang-tab {
   background: none;
   border: none;
   color: var(--text-dim);
@@ -355,12 +356,14 @@ textarea.output-editable:focus {
 }
 
 .lang-tab:hover,
-.rlang-tab:hover {
+.rlang-tab:hover,
+.mlang-tab:hover {
   color: var(--text-muted);
 }
 
 .lang-tab.active,
-.rlang-tab.active {
+.rlang-tab.active,
+.mlang-tab.active {
   background: var(--surface-2);
   color: var(--accent);
 }

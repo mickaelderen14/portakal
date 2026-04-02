@@ -29,6 +29,7 @@
         <button class="tab" data-tab="receipt" role="tab">Receipt</button>
         <button class="tab" data-tab="validate" role="tab">Validate</button>
         <button class="tab" data-tab="convert" role="tab">Convert</button>
+        <button class="tab" data-tab="markup" role="tab">Markup</button>
       </nav>
 
       <section class="panel active" data-panel="label">
@@ -646,6 +647,55 @@ PRINT 1'
               </div>
               <pre
                 id="c-output"
+                class="output-code"
+                style="min-height: 200px; max-height: 400px"
+              ></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ MARKUP ═══════ -->
+      <section class="panel" data-panel="markup">
+        <div class="validate-input">
+          <div class="validate-header">
+            <h3 class="validate-title">HTML-like Label Markup</h3>
+            <div class="lang-tabs">
+              <button class="mlang-tab active" data-mlang="tsc">TSC</button>
+              <button class="mlang-tab" data-mlang="zpl">ZPL</button>
+              <button class="mlang-tab" data-mlang="epl">EPL</button>
+              <button class="mlang-tab" data-mlang="cpcl">CPCL</button>
+              <button class="mlang-tab" data-mlang="escpos">ESC/POS</button>
+            </div>
+          </div>
+          <textarea id="m-code" class="validate-code" rows="12" spellcheck="false">
+&lt;label width="40mm" height="30mm"&gt;
+  &lt;text x="10" y="10" size="2" bold&gt;ACME Corp&lt;/text&gt;
+  &lt;text x="10" y="35"&gt;SKU: PRD-00123&lt;/text&gt;
+  &lt;line x1="5" y1="55" x2="315" y2="55" /&gt;
+  &lt;box x="5" y="5" width="310" height="230" border="2" /&gt;
+&lt;/label&gt;</textarea
+          >
+        </div>
+        <div class="validate-output">
+          <div class="validate-left">
+            <div class="preview-section">
+              <div class="preview-header"><h3>Preview</h3></div>
+              <div id="m-preview" class="preview-canvas" style="min-height: 250px"></div>
+              <div class="preview-toolbar">
+                <button class="btn" id="m-download-svg">SVG</button>
+                <button class="btn" id="m-download-png">PNG</button>
+              </div>
+            </div>
+          </div>
+          <div class="validate-right">
+            <div class="code-section">
+              <div class="output-header">
+                <span id="m-stats" class="validate-stats"></span>
+                <button id="btn-copy-markup" class="btn">Copy</button>
+              </div>
+              <pre
+                id="m-output"
                 class="output-code"
                 style="min-height: 200px; max-height: 400px"
               ></pre>

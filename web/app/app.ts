@@ -13,6 +13,7 @@ import {
   parseIPL,
   convert,
   validate,
+  markup,
   type LabelBuilder,
   type MonochromeBitmap,
   type ResolvedLabel,
@@ -664,6 +665,72 @@ export function setupApp(): void {
     setTimeout(() => (btn.textContent = "Copy"), 1500);
   });
 
+  // Markup tab
+  let markupLang = "tsc";
+
+  for (const tab of $$(".mlang-tab")) {
+    tab.addEventListener("click", () => {
+      $$(".mlang-tab").forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+      markupLang = tab.dataset.mlang!;
+      runMarkup();
+    });
+  }
+
+  function runMarkup(): void {
+    const code = ($("#m-code") as HTMLTextAreaElement).value;
+    if (!code.trim()) {
+      $("#m-output").textContent = "";
+      $("#m-preview").innerHTML = "";
+      $("#m-stats").textContent = "";
+      return;
+    }
+
+    try {
+      const b = markup(code);
+      const resolved = b.resolve();
+
+      // Preview
+      $("#m-preview").innerHTML = b.toPreview();
+
+      // Compile
+      let output: string;
+      if (markupLang === "escpos") {
+        output = formatHex(b.toESCPOS());
+      } else if (markupLang === "zpl") {
+        output = b.toZPL();
+      } else if (markupLang === "epl") {
+        output = b.toEPL();
+      } else if (markupLang === "cpcl") {
+        output = b.toCPCL();
+      } else {
+        output = b.toTSC();
+      }
+
+      $("#m-output").textContent = output;
+      $("#m-stats").textContent =
+        `${markupLang.toUpperCase()} · ${resolved.elements.length} elements · ${resolved.widthDots}×${resolved.heightDots}`;
+    } catch (e: any) {
+      $("#m-output").textContent = `Error: ${e.message}`;
+      $("#m-preview").innerHTML = "";
+      $("#m-stats").textContent = "";
+    }
+  }
+
+  $("#m-code").addEventListener("input", runMarkup);
+
+  $("#btn-copy-markup").addEventListener("click", () => {
+    const text = $("#m-output").textContent ?? "";
+    navigator.clipboard.writeText(text);
+    const btn = $("#btn-copy-markup");
+    btn.textContent = "Copied!";
+    setTimeout(() => (btn.textContent = "Copy"), 1500);
+  });
+
+  // Markup downloads
+  $("#m-download-svg").addEventListener("click", () => downloadSVG("m-preview", "label.svg"));
+  $("#m-download-png").addEventListener("click", () => downloadPNG("m-preview", "label.png"));
+
   // Download helpers
   function downloadSVG(containerId: string, filename: string): void {
     const svg = $(`#${containerId}`).innerHTML;
@@ -731,6 +798,7 @@ export function setupApp(): void {
   generateReceipt();
   runValidate();
   runConvert();
+  runMarkup();
 }
 
 function generateReceipt(): void {

